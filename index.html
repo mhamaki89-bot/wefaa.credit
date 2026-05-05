@@ -6,162 +6,395 @@
 <title>متابعة مديونيات — فرع الوفاء</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:#0d1117;--surface:#161b22;--surface2:#1c2330;--border:#30363d;
-    --accent:#00b4d8;--accent2:#0077b6;--gold:#f4a261;
-    --green:#2ecc71;--red:#e74c3c;--yellow:#f39c12;
-    --text:#e6edf3;--muted:#8b949e;--radius:12px;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+/* ══════════════════════════════════════════
+   NEUMORPHISM DESIGN SYSTEM — DARK MODE
+══════════════════════════════════════════ */
+:root {
+  --bg:          #1e2330;
+  --surface:     #1e2330;
+  --surface-2:   #232a3b;
+  --sh-dark:     #131720;
+  --sh-light:    #293148;
+  --text:        #cdd6f4;
+  --text-muted:  #6c7a99;
+  --accent:      #008080;
+  --accent-glow: #00b3b3;
+  --success:     #00A63D;
+  --export:      #FE9900;
+  --danger:      #FF2157;
+  --val-color:   #4ec9b0;
+  --gold:        #f4a261;
+  --yellow:      #f39c12;
+  --border:      #2d3748;
+  --td-border:   #2a3044;
+  --th-bg:       #1a2030;
+  --radius:      16px;
+  --nm-raised:    6px 6px 14px var(--sh-dark), -6px -6px 14px var(--sh-light);
+  --nm-inset:     inset 4px 4px 10px var(--sh-dark), inset -4px -4px 10px var(--sh-light);
+  --nm-raised-lg: 12px 12px 28px var(--sh-dark), -12px -12px 28px var(--sh-light);
+  --nm-pressed:   inset 3px 3px 8px var(--sh-dark), inset -3px -3px 8px var(--sh-light);
+}
 
-  header{background:linear-gradient(135deg,var(--accent2),#023e8a);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(0,180,216,.3);position:sticky;top:0;z-index:100;}
-  .header-title{font-size:1.3rem;font-weight:900;}
-  .header-date{font-size:.8rem;color:rgba(255,255,255,.7);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
-  /* SEARCH */
-  .search-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;position:sticky;top:61px;z-index:98;}
-  .search-wrap{max-width:700px;margin:0 auto;position:relative;}
-  .search-wrap input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:999px;padding:9px 16px 9px 40px;color:var(--text);font-family:'Cairo',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s;direction:rtl;}
-  .search-wrap input:focus{border-color:var(--accent);}
-  .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);}
-  #search-results{position:absolute;top:calc(100% + 4px);right:0;left:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;z-index:200;max-height:300px;overflow-y:auto;display:none;box-shadow:0 8px 30px rgba(0,0,0,.5);}
-  .search-item{padding:12px 16px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;transition:background .15s;}
-  .search-item:last-child{border-bottom:none;}
-  .search-item:hover{background:var(--surface2);}
-  .search-item-name{font-weight:700;font-size:.9rem;}
-  .search-item-meta{font-size:.78rem;color:var(--muted);}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--surface);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
+::-webkit-scrollbar-thumb:hover{background:var(--accent);}
 
-  /* TABS */
-  .tabs-bar{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:112px;z-index:97;overflow-x:auto;}
-  .tab-btn{flex:1;min-width:80px;padding:13px 6px;background:none;border:none;color:var(--muted);font-family:'Cairo',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;position:relative;transition:color .2s;display:flex;align-items:center;justify-content:center;gap:4px;}
-  .tab-btn.active{color:var(--accent);}
-  .tab-btn.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--accent);border-radius:3px 3px 0 0;}
-  .badge{background:var(--red);color:#fff;border-radius:999px;font-size:.68rem;padding:1px 6px;font-weight:700;min-width:18px;text-align:center;display:none;}
-  .badge.show{display:inline-block;}
-  .badge-orange{background:var(--yellow)!important;}
+/* ── HEADER ── */
+header{
+  background:linear-gradient(135deg,#006666,#023e8a);
+  padding:16px 28px;display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 4px 24px rgba(0,128,128,.35);
+  position:sticky;top:0;z-index:100;
+}
+.header-title{font-size:1.35rem;font-weight:900;letter-spacing:.5px;color:#fff;}
+.header-date{font-size:.8rem;color:rgba(255,255,255,.7);margin-top:2px;}
+.header-icon{font-size:1.8rem;filter:drop-shadow(0 2px 6px rgba(0,180,216,.4));}
 
-  /* PANELS */
-  .panel{display:none;padding:20px;max-width:700px;margin:0 auto;}
-  .panel.active{display:block;}
+/* ── SEARCH BAR ── */
+.search-bar{
+  background:var(--surface-2);
+  border-bottom:1px solid var(--border);
+  padding:12px 24px;
+  position:sticky;top:65px;z-index:98;
+}
+.search-wrap{max-width:1100px;margin:0 auto;position:relative;}
+.search-wrap input{
+  width:100%;
+  background:var(--surface);
+  box-shadow:var(--nm-inset);
+  border:none;
+  border-radius:999px;
+  padding:11px 18px 11px 44px;
+  color:var(--text);
+  font-family:'Cairo',sans-serif;
+  font-size:.92rem;
+  outline:none;
+  transition:box-shadow .2s;
+  direction:rtl;
+}
+.search-wrap input:focus{box-shadow:var(--nm-pressed);}
+.search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:1.05rem;}
+#search-results{
+  position:absolute;top:calc(100% + 6px);right:0;left:0;
+  background:var(--surface);
+  box-shadow:var(--nm-raised-lg);
+  border-radius:14px;z-index:200;max-height:300px;overflow-y:auto;display:none;
+}
+.search-item{padding:13px 18px;cursor:pointer;border-bottom:1px solid var(--td-border);display:flex;justify-content:space-between;align-items:center;transition:background .15s;}
+.search-item:last-child{border-bottom:none;}
+.search-item:hover{background:var(--surface-2);}
+.search-item-name{font-weight:700;font-size:.92rem;}
+.search-item-meta{font-size:.78rem;color:var(--text-muted);}
 
-  /* CARD */
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
-  .card-title{font-size:1rem;font-weight:700;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+/* ── TABS ── */
+.tabs-bar{
+  display:flex;
+  background:var(--surface-2);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:117px;z-index:97;
+  overflow-x:auto;
+  padding:0 24px;
+}
+.tab-btn{
+  flex:1;min-width:90px;padding:14px 8px;
+  background:none;border:none;
+  color:var(--text-muted);
+  font-family:'Cairo',sans-serif;font-size:.85rem;font-weight:700;
+  cursor:pointer;position:relative;transition:color .2s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  white-space:nowrap;
+}
+.tab-btn.active{color:var(--accent-glow);}
+.tab-btn.active::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:var(--accent-glow);border-radius:3px 3px 0 0;
+  box-shadow:0 0 8px rgba(0,179,179,.5);
+}
+.badge{
+  background:var(--danger);color:#fff;border-radius:999px;
+  font-size:.68rem;padding:1px 6px;font-weight:700;
+  min-width:18px;text-align:center;display:none;
+}
+.badge.show{display:inline-block;}
 
-  /* FORM */
-  .form-group{margin-bottom:14px;}
-  label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px;font-weight:600;}
-  input[type=text],input[type=date],input[type=number],select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-family:'Cairo',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;direction:rtl;}
-  input[type=text]:focus,input[type=date]:focus,input[type=number]:focus,select:focus{border-color:var(--accent);}
-  input[type=number]{direction:ltr;text-align:right;}
+/* ── PANELS ── */
+.panel{display:none;padding:28px 32px;max-width:1200px;margin:0 auto;}
+.panel.active{display:block;}
 
-  /* BUTTONS */
-  .btn{width:100%;padding:13px;border:none;border-radius:8px;font-family:'Cairo',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .2s,transform .1s;}
-  .btn:active{transform:scale(.98);}
-  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
-  .btn-gold{background:linear-gradient(135deg,var(--gold),#e76f51);color:#fff;}
-  .btn-green{background:linear-gradient(135deg,var(--green),#27ae60);color:#fff;}
-  .btn-sm{width:auto;padding:7px 14px;font-size:.82rem;border-radius:6px;}
-  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted);}
-  .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
-  .btn-danger{background:var(--red);color:#fff;}
+/* ── CARD ── */
+.card{
+  background:var(--surface);
+  box-shadow:var(--nm-raised);
+  border-radius:var(--radius);
+  padding:24px;margin-bottom:20px;
+}
+.card-title{font-size:1.05rem;font-weight:900;color:var(--accent-glow);margin-bottom:18px;display:flex;align-items:center;gap:8px;letter-spacing:.3px;}
 
-  /* TABLE */
-  .table-wrap{overflow-x:auto;}
-  table{width:100%;border-collapse:collapse;font-size:.85rem;}
-  th{background:var(--surface2);padding:10px 12px;text-align:right;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap;}
-  td{padding:10px 12px;border-bottom:1px solid rgba(48,54,61,.5);vertical-align:middle;}
-  tr:last-child td{border-bottom:none;}
-  tr:hover td{background:rgba(255,255,255,.02);}
+/* ── FORM ── */
+.form-group{margin-bottom:16px;}
+label{display:block;font-size:.78rem;color:var(--text-muted);margin-bottom:7px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
+input[type=text],input[type=date],input[type=number],select{
+  width:100%;
+  background:var(--surface);
+  box-shadow:var(--nm-inset);
+  border:none;
+  border-radius:10px;
+  padding:13px 16px;
+  color:var(--text);
+  font-family:'Cairo',sans-serif;font-size:.95rem;
+  outline:none;transition:box-shadow .2s;direction:rtl;
+}
+input[type=text]:focus,input[type=date]:focus,input[type=number]:focus,select:focus{box-shadow:var(--nm-pressed);}
+input[type=number]{direction:ltr;text-align:right;}
+select option{background:var(--surface-2);}
 
-  /* STATUS */
-  .status{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.75rem;font-weight:700;white-space:nowrap;}
-  .status-paid{background:rgba(46,204,113,.15);color:var(--green);border:1px solid rgba(46,204,113,.3);}
-  .status-partial{background:rgba(243,156,18,.15);color:var(--yellow);border:1px solid rgba(243,156,18,.3);}
-  .status-unpaid{background:rgba(231,76,60,.15);color:var(--red);border:1px solid rgba(231,76,60,.3);}
+/* ── BUTTONS ── */
+.btn{
+  width:100%;padding:14px;border:none;
+  border-radius:12px;
+  font-family:'Cairo',sans-serif;font-size:1rem;font-weight:700;
+  cursor:pointer;transition:box-shadow .2s,transform .1s;
+  box-shadow:var(--nm-raised);
+}
+.btn:active{transform:scale(.98);box-shadow:var(--nm-inset);}
+.btn-primary{background:linear-gradient(135deg,#006666,#004d4d);color:#fff;box-shadow:6px 6px 14px var(--sh-dark),-6px -6px 14px var(--sh-light),0 0 14px rgba(0,128,128,.2);}
+.btn-primary:hover{box-shadow:6px 6px 18px var(--sh-dark),-6px -6px 18px var(--sh-light),0 0 20px rgba(0,179,179,.3);}
+.btn-gold{background:linear-gradient(135deg,#f4a261,#e76f51);color:#fff;box-shadow:6px 6px 14px var(--sh-dark),-6px -6px 14px var(--sh-light);}
+.btn-gold:hover{box-shadow:6px 6px 18px var(--sh-dark),-6px -6px 18px var(--sh-light),0 0 16px rgba(244,162,97,.3);}
+.btn-green{background:linear-gradient(135deg,#00A63D,#007a2d);color:#fff;box-shadow:6px 6px 14px var(--sh-dark),-6px -6px 14px var(--sh-light);}
+.btn-green:hover{box-shadow:6px 6px 18px var(--sh-dark),-6px -6px 18px var(--sh-light),0 0 16px rgba(0,166,61,.3);}
+.btn-sm{width:auto;padding:8px 16px;font-size:.82rem;border-radius:8px;}
+.btn-outline{background:var(--surface);box-shadow:var(--nm-raised);color:var(--text-muted);}
+.btn-outline:hover{color:var(--accent-glow);box-shadow:var(--nm-raised),0 0 10px rgba(0,179,179,.15);}
+.btn-danger{background:linear-gradient(135deg,#FF2157,#cc1040);color:#fff;box-shadow:6px 6px 14px var(--sh-dark),-6px -6px 14px var(--sh-light);}
 
-  /* STATS */
-  .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
-  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;cursor:pointer;transition:border-color .2s;}
-  .stat-card:hover{border-color:var(--accent);}
-  .stat-value{font-size:1.4rem;font-weight:900;}
-  .stat-label{font-size:.72rem;color:var(--muted);margin-top:2px;}
+/* ── TABLE ── */
+.table-wrap{
+  background:var(--surface);
+  border-radius:14px;
+  box-shadow:var(--nm-raised);
+  overflow-x:auto;
+}
+table{width:100%;border-collapse:collapse;font-size:.87rem;}
+th{
+  background:var(--th-bg);
+  padding:12px 14px;text-align:right;
+  color:var(--text-muted);font-weight:700;
+  border-bottom:1px solid var(--td-border);
+  white-space:nowrap;font-size:.78rem;text-transform:uppercase;letter-spacing:.4px;
+}
+td{padding:11px 14px;border-bottom:1px solid var(--td-border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:rgba(0,128,128,.06);}
 
-  /* REPORT */
-  .report-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
-  .today-label{font-size:.82rem;background:rgba(0,180,216,.1);border:1px solid rgba(0,180,216,.3);color:var(--accent);padding:4px 12px;border-radius:999px;}
-  #report-snap{background:var(--surface);border-radius:var(--radius);padding:16px;}
-  .snap-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
-  .snap-title{font-size:1rem;font-weight:900;}
-  .snap-subtitle{font-size:.78rem;color:var(--muted);}
+/* ── STATUS BADGES ── */
+.status{display:inline-block;padding:4px 12px;border-radius:999px;font-size:.75rem;font-weight:700;white-space:nowrap;}
+.status-paid{background:rgba(0,166,61,.15);color:#00A63D;border:1px solid rgba(0,166,61,.3);}
+.status-partial{background:rgba(243,156,18,.15);color:var(--yellow);border:1px solid rgba(243,156,18,.3);}
+.status-unpaid{background:rgba(255,33,87,.15);color:var(--danger);border:1px solid rgba(255,33,87,.3);}
 
-  /* COLLECTION BALANCE */
-  .client-invoices{background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:10px;}
-  .client-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:.85rem;}
-  .client-row:last-child{border-bottom:none;}
+/* ── STATS GRID ── */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+.stat-card{
+  background:var(--surface);
+  box-shadow:var(--nm-raised);
+  border-radius:14px;
+  padding:18px;text-align:center;
+  cursor:pointer;transition:box-shadow .2s;
+}
+.stat-card:hover{box-shadow:var(--nm-raised),0 0 12px rgba(0,179,179,.15);}
+.stat-value{font-size:1.6rem;font-weight:900;color:var(--val-color);}
+.stat-label{font-size:.72rem;color:var(--text-muted);margin-top:4px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
 
-  /* EMPTY */
-  .empty{text-align:center;padding:40px 20px;color:var(--muted);}
-  .empty-icon{font-size:3rem;margin-bottom:10px;}
+/* ── REPORT PANEL ── */
+.report-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+.today-label{
+  font-size:.82rem;font-weight:700;
+  background:rgba(0,128,128,.15);
+  border:1px solid rgba(0,179,179,.3);
+  color:var(--accent-glow);
+  padding:6px 16px;border-radius:999px;
+}
+#report-snap{
+  background:var(--surface);
+  box-shadow:var(--nm-raised);
+  border-radius:var(--radius);
+  padding:20px;
+}
+.snap-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--td-border);}
+.snap-title{font-size:1.05rem;font-weight:900;color:var(--accent-glow);}
+.snap-subtitle{font-size:.78rem;color:var(--text-muted);}
 
-  /* TOAST */
-  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border);color:var(--text);padding:12px 24px;border-radius:999px;font-size:.9rem;font-weight:600;z-index:9999;transition:transform .3s;white-space:nowrap;box-shadow:0 8px 30px rgba(0,0,0,.4);}
-  #toast.show{transform:translateX(-50%) translateY(0);}
-  #toast.success{border-color:var(--green);color:var(--green);}
-  #toast.error{border-color:var(--red);color:var(--red);}
+/* ── COLLECTION BALANCE ── */
+.client-invoices{
+  background:var(--surface);
+  box-shadow:var(--nm-inset);
+  border-radius:10px;padding:14px;margin-bottom:12px;
+}
+.client-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--td-border);font-size:.85rem;}
+.client-row:last-child{border-bottom:none;}
 
-  /* CLIENT MODAL */
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:none;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;}
-  .modal-overlay.open{display:flex;}
-  .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:700px;margin-top:10px;}
-  .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
-  .modal-title{font-size:1.15rem;font-weight:900;color:var(--accent);}
-  .close-btn{background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;}
-  .close-btn:hover{color:var(--text);}
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:48px 20px;color:var(--text-muted);}
+.empty-icon{font-size:3.5rem;margin-bottom:12px;}
 
-  /* OVERDUE ALERT */
-  .overdue-alert{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.3);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:.88rem;}
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:var(--surface);
+  box-shadow:var(--nm-raised-lg);
+  color:var(--text);
+  padding:13px 28px;border-radius:999px;
+  font-size:.92rem;font-weight:700;
+  z-index:9999;transition:transform .3s;white-space:nowrap;
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.success{color:var(--success);}
+#toast.error{color:var(--danger);}
 
-  /* QUICK VIEW PANEL */
-  .quick-panel{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;display:none;}
-  .quick-panel.open{display:block;}
-  .quick-panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
-  .quick-panel-title{font-weight:700;font-size:.95rem;color:var(--accent);}
+/* ── CLIENT MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(13,16,23,.82);
+  backdrop-filter:blur(4px);
+  z-index:500;display:none;
+  align-items:flex-start;justify-content:center;
+  padding:20px;overflow-y:auto;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--surface);
+  box-shadow:var(--nm-raised-lg);
+  border-radius:20px;
+  padding:28px;width:100%;max-width:1000px;margin-top:12px;
+}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.modal-title{font-size:1.2rem;font-weight:900;color:var(--accent-glow);}
+.close-btn{
+  background:var(--surface);
+  box-shadow:var(--nm-raised);
+  border:none;color:var(--text-muted);
+  font-size:1.1rem;cursor:pointer;
+  width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  transition:box-shadow .2s,color .2s;
+}
+.close-btn:hover{color:var(--danger);box-shadow:var(--nm-inset);}
 
-  /* CHECKBOX FILTER */
-  .check-filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
-  .check-label{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.85rem;font-weight:600;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);transition:all .2s;user-select:none;}
-  .check-label:hover{border-color:var(--accent);}
-  .check-label input[type=checkbox]{display:none;}
-  .check-label.checked-all{border-color:var(--accent);color:var(--accent);background:rgba(0,180,216,.1);}
-  .check-label.checked-unpaid{border-color:var(--red);color:var(--red);background:rgba(231,76,60,.1);}
-  .check-label.checked-partial{border-color:var(--yellow);color:var(--yellow);background:rgba(243,156,18,.1);}
-  .check-label.checked-paid{border-color:var(--green);color:var(--green);background:rgba(46,204,113,.1);}
+/* ── QUICK VIEW PANEL ── */
+.quick-panel{
+  background:var(--surface);
+  box-shadow:var(--nm-inset);
+  border-radius:var(--radius);
+  padding:18px;margin-bottom:20px;display:none;
+}
+.quick-panel.open{display:block;}
+.quick-panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.quick-panel-title{font-weight:900;font-size:1rem;color:var(--accent-glow);}
 
-  /* COLLECTION DATES in modal */
-  .col-dates{font-size:.72rem;color:var(--muted);margin-top:3px;}
+/* ── CHECKBOX FILTER ── */
+.check-filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+.check-label{
+  display:flex;align-items:center;gap:6px;cursor:pointer;
+  font-size:.85rem;font-weight:700;padding:8px 16px;
+  border-radius:10px;
+  background:var(--surface);
+  box-shadow:var(--nm-raised);
+  transition:all .2s;user-select:none;color:var(--text-muted);
+}
+.check-label input[type=checkbox]{display:none;}
+.check-label.checked-all{box-shadow:var(--nm-inset);color:var(--accent-glow);}
+.check-label.checked-unpaid{box-shadow:var(--nm-inset);color:var(--danger);}
+.check-label.checked-partial{box-shadow:var(--nm-inset);color:var(--yellow);}
+.check-label.checked-paid{box-shadow:var(--nm-inset);color:var(--success);}
 
-  /* PRINT / SNAPSHOT HEADER (visible in canvas only) */
-  #client-snap-header{display:none;}
+/* ── COLLECTION DATES in modal ── */
+.col-dates{font-size:.72rem;color:var(--text-muted);margin-top:3px;}
 
-  /* POSTPONE POPUP */
-  .postpone-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:600;display:none;align-items:center;justify-content:center;padding:20px;}
-  .postpone-overlay.open{display:flex;}
-  .postpone-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;width:100%;max-width:360px;box-shadow:0 12px 40px rgba(0,0,0,.5);}
-  .postpone-title{font-weight:900;font-size:1rem;color:var(--gold);margin-bottom:6px;}
-  .postpone-client{font-size:.82rem;color:var(--muted);margin-bottom:16px;}
-  .postpone-tabs{display:flex;gap:8px;margin-bottom:14px;}
-  .p-tab{flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-family:'Cairo',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;}
-  .p-tab.active{border-color:var(--gold);color:var(--gold);background:rgba(244,162,97,.1);}
-  .p-section{display:none;}.p-section.open{display:block;}
+/* ── POSTPONE POPUP ── */
+.postpone-overlay{
+  position:fixed;inset:0;
+  background:rgba(13,16,23,.75);
+  backdrop-filter:blur(4px);
+  z-index:600;display:none;
+  align-items:center;justify-content:center;padding:20px;
+}
+.postpone-overlay.open{display:flex;}
+.postpone-box{
+  background:var(--surface);
+  box-shadow:var(--nm-raised-lg);
+  border-radius:20px;
+  padding:26px;width:100%;max-width:380px;
+}
+.postpone-title{font-weight:900;font-size:1.05rem;color:var(--gold);margin-bottom:6px;}
+.postpone-client{font-size:.82rem;color:var(--text-muted);margin-bottom:18px;}
+.postpone-tabs{display:flex;gap:10px;margin-bottom:16px;}
+.p-tab{
+  flex:1;padding:10px;
+  background:var(--surface);
+  box-shadow:var(--nm-raised);
+  border:none;border-radius:10px;
+  color:var(--text-muted);
+  font-family:'Cairo',sans-serif;font-size:.85rem;font-weight:700;
+  cursor:pointer;transition:all .2s;text-align:center;
+}
+.p-tab.active{box-shadow:var(--nm-inset);color:var(--gold);}
+.p-section{display:none;}.p-section.open{display:block;}
 
-  @media(max-width:480px){
-    .stats-grid{grid-template-columns:1fr 1fr;}
-    header{padding:12px 16px;}
-    .panel{padding:14px;}
-    .tab-btn{font-size:.72rem;min-width:70px;}
-  }
+/* ── OVERDUE ALERT ── */
+.overdue-alert{
+  background:rgba(255,33,87,.08);
+  box-shadow:inset 2px 2px 6px rgba(255,33,87,.1);
+  border-radius:10px;padding:12px 16px;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;font-size:.88rem;color:#ff6b6b;
+}
+
+/* ── DATE INPUT in report bar ── */
+.report-date-input{
+  background:var(--surface);
+  box-shadow:var(--nm-inset);
+  border:none;border-radius:10px;
+  padding:9px 12px;font-size:.82rem;
+  color:var(--text);font-family:'Cairo',sans-serif;
+  outline:none;
+}
+.report-date-input:focus{box-shadow:var(--nm-pressed);}
+
+/* ── INFO BOXES ── */
+.info-box{
+  background:rgba(0,128,128,.1);
+  box-shadow:inset 2px 2px 8px rgba(0,128,128,.15);
+  border-radius:10px;padding:12px 16px;
+  margin-bottom:14px;font-size:.82rem;color:var(--text-muted);
+}
+
+/* ── DAY QUICK STATS ── */
+.day-stat-row{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+.day-stat{
+  flex:1;min-width:120px;
+  background:var(--surface);
+  box-shadow:var(--nm-raised);
+  border-radius:12px;padding:12px 16px;text-align:center;
+}
+.day-stat-val{font-weight:900;font-size:1.1rem;}
+.day-stat-lbl{font-size:.73rem;color:var(--text-muted);margin-top:2px;}
+
+@media(max-width:900px){
+  .panel{padding:18px 16px;max-width:100%;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .tabs-bar{padding:0 8px;}
+}
+@media(max-width:600px){
+  header{padding:12px 16px;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .tab-btn{font-size:.73rem;min-width:75px;}
+  .panel{padding:14px 12px;}
+}
 </style>
 </head>
 <body>
@@ -171,7 +404,7 @@
     <div class="header-title">💼 متابعة مديونيات — فرع الوفاء</div>
     <div class="header-date" id="hdr-date"></div>
   </div>
-  <div style="font-size:1.6rem">🏦</div>
+  <div class="header-icon">🏦</div>
 </header>
 
 <!-- SEARCH -->
@@ -195,14 +428,20 @@
 <div class="panel active" id="panel-invoices">
   <div class="card">
     <div class="card-title">➕ تسجيل فاتورة جديدة</div>
-    <div class="form-group">
-      <label>اسم العميل</label>
-      <input type="text" id="inv-client" placeholder="أدخل اسم العميل..." list="clients-list">
-      <datalist id="clients-list"></datalist>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div>
+        <div class="form-group">
+          <label>اسم العميل</label>
+          <input type="text" id="inv-client" placeholder="أدخل اسم العميل..." list="clients-list">
+          <datalist id="clients-list"></datalist>
+        </div>
+        <div class="form-group"><label>تاريخ الفاتورة</label><input type="date" id="inv-date"></div>
+      </div>
+      <div>
+        <div class="form-group"><label>مبلغ الفاتورة (جنيه)</label><input type="number" id="inv-amount" placeholder="0.00" min="0" step="0.01"></div>
+        <div class="form-group"><label>رقم الفاتورة (اختياري)</label><input type="text" id="inv-number" placeholder="مثل: INV-001"></div>
+      </div>
     </div>
-    <div class="form-group"><label>تاريخ الفاتورة</label><input type="date" id="inv-date"></div>
-    <div class="form-group"><label>مبلغ الفاتورة (جنيه)</label><input type="number" id="inv-amount" placeholder="0.00" min="0" step="0.01"></div>
-    <div class="form-group"><label>رقم الفاتورة (اختياري)</label><input type="text" id="inv-number" placeholder="مثل: INV-001"></div>
     <button class="btn btn-primary" onclick="addInvoice()">💾 حفظ الفاتورة</button>
   </div>
   <!-- Stats — clickable -->
@@ -228,14 +467,20 @@
 <div class="panel" id="panel-collection">
   <div class="card">
     <div class="card-title">💵 تسجيل تحصيل</div>
-    <div class="form-group">
-      <label>اسم العميل</label>
-      <select id="col-client" onchange="showClientBalance()"><option value="">-- اختر العميل --</option></select>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div>
+        <div class="form-group">
+          <label>اسم العميل</label>
+          <select id="col-client" onchange="showClientBalance()"><option value="">-- اختر العميل --</option></select>
+        </div>
+        <div class="form-group"><label>المبلغ المحصل (جنيه)</label><input type="number" id="col-amount" placeholder="0.00" min="0" step="0.01"></div>
+        <div class="form-group"><label>تاريخ التحصيل</label><input type="date" id="col-date"></div>
+        <button class="btn btn-gold" onclick="applyCollection()">✅ تطبيق التحصيل (FIFO)</button>
+      </div>
+      <div>
+        <div id="client-balance-info" style="display:none;"></div>
+      </div>
     </div>
-    <div id="client-balance-info" style="display:none;margin-bottom:14px;"></div>
-    <div class="form-group"><label>المبلغ المحصل (جنيه)</label><input type="number" id="col-amount" placeholder="0.00" min="0" step="0.01"></div>
-    <div class="form-group"><label>تاريخ التحصيل</label><input type="date" id="col-date"></div>
-    <button class="btn btn-gold" onclick="applyCollection()">✅ تطبيق التحصيل (FIFO)</button>
   </div>
 </div>
 
@@ -243,9 +488,9 @@
 <div class="panel" id="panel-report">
   <div class="report-header">
     <span class="today-label" id="report-today-lbl"></span>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <input type="date" id="report-date-filter" style="width:auto;padding:7px 10px;font-size:.82rem;border-radius:8px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Cairo',sans-serif" onchange="renderReport()">
-      <button class="btn btn-sm btn-outline" onclick="resetReportDate()" style="font-size:.78rem">📅 اليوم</button>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <input type="date" id="report-date-filter" class="report-date-input" onchange="renderReport()">
+      <button class="btn btn-sm btn-outline" onclick="resetReportDate()">📅 اليوم</button>
       <button class="btn btn-sm btn-outline" onclick="captureReport()">📸 صورة</button>
       <button class="btn btn-sm btn-green" onclick="exportReportExcel()">📊 Excel</button>
     </div>
@@ -256,7 +501,7 @@
         <div class="snap-title">📋 تحصيلات اليوم — فرع الوفاء</div>
         <div class="snap-subtitle" id="snap-date-lbl"></div>
       </div>
-      <div style="font-size:.8rem;color:var(--muted)" id="snap-count-lbl"></div>
+      <div style="font-size:.8rem;color:var(--text-muted)" id="snap-count-lbl"></div>
     </div>
     <div id="daily-report-body"></div>
   </div>
@@ -264,9 +509,8 @@
 
 <!-- ══ ALL ══ -->
 <div class="panel" id="panel-all">
-  <div style="margin-bottom:14px;">
-    <div style="font-weight:700;margin-bottom:10px;">كل الفواتير</div>
-    <!-- CHECKBOX FILTERS -->
+  <div style="margin-bottom:18px;">
+    <div style="font-weight:900;margin-bottom:12px;font-size:1.05rem;color:var(--accent-glow);">📂 كل الفواتير</div>
     <div class="check-filters" id="check-filters">
       <label class="check-label checked-all" id="chk-lbl-all">
         <input type="checkbox" id="chk-all" checked onchange="onChkAll()"> الكل
@@ -281,9 +525,7 @@
         <input type="checkbox" id="chk-paid" onchange="onChkFilter()"> مسددة
       </label>
     </div>
-    <div style="display:flex;justify-content:flex-left;gap:8px;">
-      <button class="btn btn-sm btn-danger" onclick="clearAllData()">🗑 مسح الكل</button>
-    </div>
+    <button class="btn btn-sm btn-danger" onclick="clearAllData()">🗑 مسح الكل</button>
   </div>
   <div id="all-invoices-body"></div>
 </div>
@@ -299,9 +541,8 @@
       <button class="p-tab active" onclick="switchPTab('days',this)">➕ أضف أيام</button>
       <button class="p-tab" onclick="switchPTab('date',this)">📅 تاريخ محدد</button>
     </div>
-    <!-- أضف أيام -->
     <div class="p-section open" id="pp-days-section">
-      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
         <button class="btn btn-sm btn-outline" onclick="setDays(1)">+1</button>
         <button class="btn btn-sm btn-outline" onclick="setDays(2)">+2</button>
         <button class="btn btn-sm btn-outline" onclick="setDays(3)">+3</button>
@@ -309,23 +550,22 @@
         <button class="btn btn-sm btn-outline" onclick="setDays(7)">+7</button>
         <button class="btn btn-sm btn-outline" onclick="setDays(10)">+10</button>
       </div>
-      <div class="form-group" style="margin-bottom:14px">
+      <div class="form-group" style="margin-bottom:16px">
         <label>أو أدخل عدد الأيام يدوياً</label>
-        <input type="number" id="pp-days-input" placeholder="عدد الأيام..." min="1" max="365" style="direction:ltr;text-align:right">
+        <input type="number" id="pp-days-input" placeholder="عدد الأيام..." min="1" max="365">
       </div>
     </div>
-    <!-- تاريخ محدد -->
     <div class="p-section" id="pp-date-section">
-      <div class="form-group" style="margin-bottom:14px">
+      <div class="form-group" style="margin-bottom:16px">
         <label>اختر تاريخ التحصيل الجديد</label>
         <input type="date" id="pp-date-input">
       </div>
     </div>
-    <div style="background:rgba(244,162,97,.08);border:1px solid rgba(244,162,97,.2);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:.82rem;color:var(--muted)">
+    <div class="info-box" style="margin-bottom:16px">
       موعد التحصيل الحالي: <span id="pp-current-due" style="color:var(--gold);font-weight:700"></span>
-      <br>موعد التحصيل الجديد: <span id="pp-new-due" style="color:var(--green);font-weight:700">—</span>
+      <br>موعد التحصيل الجديد: <span id="pp-new-due" style="color:var(--success);font-weight:700">—</span>
     </div>
-    <div style="display:flex;gap:8px">
+    <div style="display:flex;gap:10px">
       <button class="btn btn-gold" style="flex:1" onclick="applyPostpone()">✅ تأكيد التأجيل</button>
       <button class="btn btn-outline btn-sm" onclick="closePostpone()">إلغاء</button>
     </div>
@@ -339,15 +579,12 @@
       <div class="modal-title" id="modal-client-name">—</div>
       <button class="close-btn" onclick="closeModal()">✕</button>
     </div>
-    <!-- Stats for screen -->
     <div class="stats-grid" id="modal-stats"></div>
-    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+    <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap">
       <button class="btn btn-sm btn-outline" onclick="captureClientReport()">📸 صورة</button>
       <button class="btn btn-sm btn-green" onclick="exportClientExcel()">📊 Excel</button>
     </div>
-    <!-- Snap area for screenshot (includes header) -->
     <div id="modal-snap">
-      <!-- Hidden header shown only in screenshot via canvas -->
       <div id="modal-body"></div>
     </div>
   </div>
@@ -358,7 +595,7 @@
 <script>
 // ═══ DATA ═══
 const SK='wafa_invoices_v1';
-const CK='wafa_credits_v1'; // رصيد دائن per client
+const CK='wafa_credits_v1';
 function load(){try{return JSON.parse(localStorage.getItem(SK))||[];}catch{return[];}}
 function save(d){localStorage.setItem(SK,JSON.stringify(d));}
 function loadCredits(){try{return JSON.parse(localStorage.getItem(CK))||{};}catch{return{};}}
@@ -368,7 +605,6 @@ function addCredit(client,amount,date){
   const c=loadCredits();
   if(!c[client])c[client]=0;
   c[client]=+(c[client]+amount).toFixed(2);
-  // log it
   const logKey=CK+'_log';
   const log=JSON.parse(localStorage.getItem(logKey)||'[]');
   log.push({client,amount,date,type:'credit'});
@@ -387,31 +623,21 @@ function fmt(n){return Number(n||0).toLocaleString('ar-EG',{minimumFractionDigit
 function fmtDate(d){if(!d)return'';const[y,m,day]=d.split('-');return`${day}/${m}/${y}`;}
 function todayStr(){return new Date().toISOString().slice(0,10);}
 function addDays(ds,n){
-  // نفصل السنة والشهر واليوم يدوياً عشان نتجنب مشكلة timezone في JavaScript
   const [y,m,d]=ds.split('-').map(Number);
   const date=new Date(y,m-1,d+n);
   return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');
 }
-// حساب موعد التحصيل مع قواعد:
-// 1- لو وقع جمعة → يترحل لخميس قبله
-// 2- لو تجاوز الشهر → آخر يوم في شهر الفاتورة
 function calcDueDate(invDate, offset){
   const [iy,im,id]=invDate.split('-').map(Number);
   const rawDate=new Date(iy,im-1,id+7+(offset||0));
   const rawMonth=rawDate.getMonth()+1;
-
   let resDate=rawDate;
-
-  // لو تجاوز الشهر → آخر يوم في شهر الفاتورة
   if(rawMonth!==im){
-    resDate=new Date(iy,im,0); // آخر يوم في الشهر الأصلي
+    resDate=new Date(iy,im,0);
   }
-
-  // لو وقع جمعة (5) → خميس قبله
   if(resDate.getDay()===5){
     resDate=new Date(resDate.getFullYear(),resDate.getMonth(),resDate.getDate()-1);
   }
-
   return resDate.getFullYear()+'-'+String(resDate.getMonth()+1).padStart(2,'0')+'-'+String(resDate.getDate()).padStart(2,'0');
 }
 function statusLabel(inv){const p=inv.paid||0;if(p<=0)return['unpaid','غير مسددة'];if(p>=inv.amount)return['paid','مسددة'];return['partial','مسددة جزئيا ('+fmt(p)+')'];}
@@ -446,14 +672,14 @@ function _doSearch(){
     }
   });
   const names=Object.keys(map);
-  if(!names.length){box.innerHTML='<div class="search-item"><span style="color:var(--muted)">لا توجد نتائج</span></div>';box.style.display='block';return;}
+  if(!names.length){box.innerHTML='<div class="search-item"><span style="color:var(--text-muted)">لا توجد نتائج</span></div>';box.style.display='block';return;}
   box.innerHTML=names.map(n=>`
     <div class="search-item" onmousedown="openClientModal('${esc(n)}')">
       <div>
-        <div class="search-item-name">${n} ${map[n].overdue?'<span style="color:var(--red)">⚠️</span>':''}</div>
+        <div class="search-item-name">${n} ${map[n].overdue?'<span style="color:var(--danger)">⚠️</span>':''}</div>
         <div class="search-item-meta">${map[n].count} فاتورة — متبقي: ${fmt(map[n].due)} جنيه</div>
       </div>
-      <span style="color:var(--accent);font-size:.8rem">عرض ←</span>
+      <span style="color:var(--accent-glow);font-size:.8rem">عرض ←</span>
     </div>`).join('');
   box.style.display='block';
 }
@@ -479,30 +705,28 @@ function renderModalBody(name){
   const totPaid=invs.reduce((s,i)=>s+(i.paid||0),0);
   const totDue=totAmt-totPaid;
   const overdueCount=invs.filter(isOverdue).length;
-
   const credit=getCredit(name);
+
   document.getElementById('modal-stats').innerHTML=`
     <div class="stat-card" style="cursor:default">
-      <div class="stat-value" style="color:var(--accent)">${invs.length}</div>
+      <div class="stat-value" style="color:var(--accent-glow)">${invs.length}</div>
       <div class="stat-label">فواتير</div>
     </div>
     <div class="stat-card" style="cursor:default">
-      <div class="stat-value" style="color:var(--green)">${fmt(totPaid)}</div>
+      <div class="stat-value" style="color:var(--success)">${fmt(totPaid)}</div>
       <div class="stat-label">محصّل (جنيه)</div>
     </div>
     <div class="stat-card" style="cursor:default">
-      <div class="stat-value" style="color:${totDue>0?'var(--red)':'var(--green)'}">${fmt(totDue)}</div>
+      <div class="stat-value" style="color:${totDue>0?'var(--danger)':'var(--success)'}">${fmt(totDue)}</div>
       <div class="stat-label">متبقي (جنيه)</div>
     </div>
-    ${credit>0?`<div class="stat-card" style="cursor:default;border-color:rgba(46,204,113,.4);grid-column:1/-1">
-      <div class="stat-value" style="color:var(--green);font-size:1.1rem">💳 ${fmt(credit)} جنيه</div>
+    ${credit>0?`<div class="stat-card" style="cursor:default;grid-column:1/-1">
+      <div class="stat-value" style="color:var(--success);font-size:1.1rem">💳 ${fmt(credit)} جنيه</div>
       <div class="stat-label">رصيد دائن — يُخصم من الفاتورة القادمة</div>
     </div>`:''}`;
 
-
   if(!invs.length){document.getElementById('modal-body').innerHTML='<div class="empty"><div class="empty-icon">📂</div><div>لا توجد فواتير</div></div>';return;}
 
-  // Build table — each invoice shows paid amount + collection dates
   const rows = invs.map(inv=>{
     const[cls,lbl]=statusLabel(inv);
     const dd=calcDueDate(inv.date,inv.dueOffset);
@@ -514,34 +738,34 @@ function renderModalBody(name){
     return`<tr>
       <td style="direction:ltr;text-align:right">${inv.number}</td>
       <td>${fmtDate(inv.date)}</td>
-      <td style="color:${ov?'var(--red)':'var(--accent)'}">
+      <td style="color:${ov?'var(--danger)':'var(--accent-glow)'}">
         ${fmtDate(dd)}${ov?' ⚠️':''}
         ${offset>0?`<br><small style="color:var(--gold)">مؤجل +${offset} يوم</small>`:''}
       </td>
       <td>${fmt(inv.amount)}</td>
       <td>
-        <div style="color:var(--green);font-weight:600">${fmt(paid)}</div>
+        <div style="color:var(--success);font-weight:600">${fmt(paid)}</div>
         ${colDates?`<div class="col-dates">📅 ${colDates}</div>`:''}
       </td>
-      <td style="color:var(--red);font-weight:700">${fmt(rem)}</td>
+      <td style="color:var(--danger);font-weight:700">${fmt(rem)}</td>
       <td><span class="status status-${cls}">${lbl}</span></td>
     </tr>`;
   }).join('');
 
   document.getElementById('modal-body').innerHTML=`
-    ${overdueCount>0?`<div style="background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.3);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:.85rem;color:#ff6b6b">⚠️ ${overdueCount} فاتورة متأخرة التحصيل</div>`:''}
+    ${overdueCount>0?`<div class="overdue-alert">⚠️ ${overdueCount} فاتورة متأخرة التحصيل</div>`:''}
     <div class="table-wrap"><table>
       <thead><tr><th>رقم الفاتورة</th><th>تاريخ الفاتورة</th><th>موعد التحصيل</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th><th>الحالة</th></tr></thead>
       <tbody>${rows}</tbody>
       <tfoot><tr>
-        <td colspan="3" style="color:var(--muted);font-weight:700">الإجمالي</td>
+        <td colspan="3" style="color:var(--text-muted);font-weight:700">الإجمالي</td>
         <td style="font-weight:700">${fmt(totAmt)}</td>
-        <td style="color:var(--green);font-weight:700">${fmt(totPaid)}</td>
-        <td style="color:var(--red);font-weight:700">${fmt(totDue)}</td>
+        <td style="color:var(--success);font-weight:700">${fmt(totPaid)}</td>
+        <td style="color:var(--danger);font-weight:700">${fmt(totDue)}</td>
         <td></td>
       </tr></tfoot>
     </table></div>
-    <div style="margin-top:12px;font-size:.75rem;color:var(--muted);text-align:center">محاسب الوفاء — ${fmtDate(todayStr())}</div>`;
+    <div style="margin-top:14px;font-size:.75rem;color:var(--text-muted);text-align:center">محاسب الوفاء — ${fmtDate(todayStr())}</div>`;
 }
 
 // ── Client Excel
@@ -570,146 +794,137 @@ function exportClientExcel(){
   showToast('✅ تم تحميل Excel');
 }
 
-// ── Client Screenshot with name + stats in image
+// ── Client Screenshot
 async function captureClientReport(){
   if(!modalClient)return;
   const invs=load().filter(i=>i.client===modalClient).sort((a,b)=>a.date.localeCompare(b.date));
   if(!invs.length)return showToast('لا توجد بيانات','error');
-
   const totAmt=invs.reduce((s,i)=>s+i.amount,0);
   const totPaid=invs.reduce((s,i)=>s+(i.paid||0),0);
   const totDue=totAmt-totPaid;
 
-  if(typeof html2canvas!=='undefined'){
-    const credit=getCredit(modalClient);
-    // Build a temporary off-screen div with full content including header
-    const wrap=document.createElement('div');
-    wrap.style.cssText='position:fixed;top:-9999px;left:-9999px;width:740px;background:#161b22;padding:20px;border-radius:12px;font-family:Cairo,Arial,sans-serif;direction:rtl;';
+  // ══ Native Canvas — الوحيد الموثوق مع Arabic RTL ══
+  {
+  const credit=getCredit(modalClient);
+  const W=1100, PX=36, ROW_H=52, ROW_H2=70 /* صف فيه تواريخ تحصيل */;
+  const HEAD_H=200, STAT_H=80, FOOT_H=56;
 
-    // Header block
-    const hdr=document.createElement('div');
-    hdr.style.cssText='background:linear-gradient(135deg,#0077b6,#023e8a);padding:16px 20px;border-radius:10px;margin-bottom:16px;';
-    hdr.innerHTML=`
-      <div style="font-size:1.2rem;font-weight:900;color:#fff;">👤 ${modalClient}</div>
-      <div style="font-size:.8rem;color:rgba(255,255,255,.7);margin-top:4px;">فرع الوفاء — تاريخ التقرير: ${fmtDate(todayStr())}</div>`;
-    wrap.appendChild(hdr);
+  // احسب ارتفاع كل صف (بعض الفواتير فيها سطر تاني للتواريخ)
+  const rowHeights=invs.map(inv=>(inv.collections&&inv.collections.length>0)?ROW_H2:ROW_H);
+  const tableH=rowHeights.reduce((s,h)=>s+h,0);
+  const H=HEAD_H+STAT_H+ROW_H+tableH+ROW_H+FOOT_H; // header+stats+thead+rows+tfoot+footer
 
-    // Stats row
-    const statsRow=document.createElement('div');
-    statsRow.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px;';
-    statsRow.innerHTML=`
-      <div style="background:#1c2330;border:1px solid #30363d;border-radius:10px;padding:12px;text-align:center;">
-        <div style="font-size:1.3rem;font-weight:900;color:#00b4d8;">${invs.length}</div>
-        <div style="font-size:.72rem;color:#8b949e;margin-top:2px;">عدد الفواتير</div>
-      </div>
-      <div style="background:#1c2330;border:1px solid #30363d;border-radius:10px;padding:12px;text-align:center;">
-        <div style="font-size:1.3rem;font-weight:900;color:#2ecc71;">${fmt(totPaid)}</div>
-        <div style="font-size:.72rem;color:#8b949e;margin-top:2px;">المحصّل (جنيه)</div>
-      </div>
-      <div style="background:#1c2330;border:1px solid #30363d;border-radius:10px;padding:12px;text-align:center;">
-        <div style="font-size:1.3rem;font-weight:900;color:#e74c3c;">${fmt(totDue)}</div>
-        <div style="font-size:.72rem;color:#8b949e;margin-top:2px;">المتبقي (جنيه)</div>
-      </div>`;
-    wrap.appendChild(statsRow);
-    if(credit>0){
-      const creditEl=document.createElement('div');
-      creditEl.style.cssText='background:rgba(46,204,113,.15);border:1px solid rgba(46,204,113,.4);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;';
-      creditEl.innerHTML=`
-        <span style="font-weight:700;color:#2ecc71;font-size:.95rem;">💳 رصيد دائن</span>
-        <span style="font-weight:900;color:#2ecc71;font-size:1.1rem;">${fmt(credit)} جنيه — يُخصم من الفاتورة القادمة</span>`;
-      wrap.appendChild(creditEl);
-    }
-    wrap.appendChild(statsRow);
+  const canvas=document.createElement('canvas');
+  canvas.width=W*2; canvas.height=H*2; // scale x2 for sharpness
+  const ctx=canvas.getContext('2d');
+  ctx.scale(2,2);
 
-    // Clone the table
-    const snapClone=document.getElementById('modal-body').cloneNode(true);
-    snapClone.style.background='transparent';
-    wrap.appendChild(snapClone);
+  // ── خلفية ──
+  ctx.fillStyle='#1e2330'; ctx.fillRect(0,0,W,H);
 
-    // Footer
-    const foot=document.createElement('div');
-    foot.style.cssText='margin-top:12px;font-size:.75rem;color:#8b949e;text-align:center;';
-    foot.textContent=`محاسب الوفاء — ${fmtDate(todayStr())}`;
-    wrap.appendChild(foot);
+  // ── Gradient Header ──
+  const gr=ctx.createLinearGradient(0,0,W,0);
+  gr.addColorStop(0,'#006666'); gr.addColorStop(1,'#023e8a');
+  ctx.fillStyle=gr; roundRect(ctx,PX/2,PX/2,W-PX,HEAD_H-20,14); ctx.fill();
 
-    document.body.appendChild(wrap);
-    try{
-      const canvas=await html2canvas(wrap,{backgroundColor:'#161b22',scale:2,useCORS:true});
-      const a=document.createElement('a');
-      a.download=`تقرير_${modalClient}_${todayStr()}.png`;
-      a.href=canvas.toDataURL();a.click();
-      showToast('✅ تم تحميل الصورة');
-    }finally{
-      document.body.removeChild(wrap);
-    }
-    return;
+  ctx.direction='rtl'; ctx.textAlign='right';
+  ctx.font='bold 28px Cairo,Arial'; ctx.fillStyle='#fff';
+  ctx.fillText('👤 '+modalClient, W-PX, 60);
+  ctx.font='15px Cairo,Arial'; ctx.fillStyle='rgba(255,255,255,.72)';
+  ctx.fillText('فرع الوفاء — تاريخ التقرير: '+fmtDate(todayStr()), W-PX, 88);
+
+  // ── Stats Cards ──
+  const sw=(W-PX*2)/3;
+  const statItems=[
+    ['عدد الفواتير',''+invs.length,'#4ec9b0'],
+    ['المحصّل (جنيه)',fmt(totPaid),'#00A63D'],
+    ['المتبقي (جنيه)',fmt(totDue),'#FF2157']
+  ];
+  const sy=HEAD_H-10; const sh=STAT_H-10;
+  statItems.forEach((st,i)=>{
+    const sx=PX+i*(sw+6);
+    ctx.fillStyle='#232a3b';
+    roundRect(ctx,sx,sy,sw-6,sh,10); ctx.fill();
+    ctx.font='bold 20px Cairo,Arial'; ctx.fillStyle=st[2]; ctx.textAlign='center';
+    ctx.fillText(st[1], sx+(sw-6)/2, sy+28);
+    ctx.font='11px Cairo,Arial'; ctx.fillStyle='#6c7a99';
+    ctx.fillText(st[0], sx+(sw-6)/2, sy+48);
+  });
+
+  // ── Credit row (optional) ──
+  let tableStartY=HEAD_H+STAT_H+8;
+  if(credit>0){
+    ctx.fillStyle='rgba(0,166,61,.12)';
+    roundRect(ctx,PX,tableStartY,W-PX*2,34,8); ctx.fill();
+    ctx.font='bold 13px Cairo,Arial'; ctx.fillStyle='#00A63D'; ctx.textAlign='right';
+    ctx.fillText('💳 رصيد دائن: '+fmt(credit)+' جنيه — يُخصم من الفاتورة القادمة', W-PX*2, tableStartY+22);
+    tableStartY+=42;
   }
 
-  // Native canvas fallback
-  const W=900,PX=32,ROW_H=44,HEAD_H=160,FOOT_H=50;
-  const H=HEAD_H+(invs.length+2)*ROW_H+FOOT_H;
-  const canvas=document.createElement('canvas');
-  canvas.width=W;canvas.height=H;
-  const ctx=canvas.getContext('2d');
-  ctx.fillStyle='#161b22';ctx.fillRect(0,0,W,H);
-
-  // Gradient header
-  const gr=ctx.createLinearGradient(0,0,W,0);
-  gr.addColorStop(0,'#0077b6');gr.addColorStop(1,'#023e8a');
-  ctx.fillStyle=gr;ctx.fillRect(0,0,W,HEAD_H-30);
-
-  ctx.direction='rtl';ctx.textAlign='right';
-  ctx.font='bold 26px Cairo,Arial';ctx.fillStyle='#fff';
-  ctx.fillText('👤 '+modalClient,W-PX,44);
-  ctx.font='15px Cairo,Arial';ctx.fillStyle='rgba(255,255,255,.75)';
-  ctx.fillText('فرع الوفاء — تاريخ التقرير: '+fmtDate(todayStr()),W-PX,70);
-
-  // Mini stats row
-  const sw=(W-PX*2)/3;const sy=86;const sh=40;
-  const statItems=[['عدد الفواتير',''+invs.length,'#00b4d8'],['المحصّل',fmt(totPaid)+' جنيه','#2ecc71'],['المتبقي',fmt(totDue)+' جنيه','#e74c3c']];
-  statItems.forEach((st,i)=>{
-    const sx=PX+i*sw;
-    ctx.fillStyle='#1c2330';ctx.strokeStyle='#30363d';ctx.lineWidth=1;
-    roundRect(ctx,sx,sy,sw-8,sh,6);ctx.fill();ctx.stroke();
-    ctx.font='bold 13px Cairo,Arial';ctx.fillStyle=st[2];ctx.textAlign='center';
-    ctx.fillText(st[1],sx+(sw-8)/2,sy+16);
-    ctx.font='11px Cairo,Arial';ctx.fillStyle='#8b949e';
-    ctx.fillText(st[0],sx+(sw-8)/2,sy+32);
-  });
-
-  // Table
+  // ── Table Header ──
   const cols=['رقم الفاتورة','تاريخ الفاتورة','موعد التحصيل','المبلغ','المدفوع','المتبقي','الحالة'];
   const colW=(W-PX*2)/cols.length;
-  let y=HEAD_H;
-  ctx.fillStyle='#1c2330';ctx.fillRect(0,y,W,ROW_H);
-  ctx.font='bold 12px Cairo,Arial';ctx.fillStyle='#8b949e';ctx.textAlign='right';ctx.direction='rtl';
-  cols.forEach((c,i)=>ctx.fillText(c,W-PX-i*colW-colW/2,y+27));
-  y+=ROW_H;
+  ctx.fillStyle='#1a2030'; ctx.fillRect(0,tableStartY,W,ROW_H);
+  ctx.font='bold 12px Cairo,Arial'; ctx.fillStyle='#6c7a99';
+  ctx.textAlign='center'; ctx.direction='rtl';
+  cols.forEach((c,i)=>ctx.fillText(c, W-PX-i*colW-colW/2, tableStartY+32));
+  let y=tableStartY+ROW_H;
 
+  // ── Table Rows ──
   invs.forEach((inv,ri)=>{
-    ctx.fillStyle=ri%2===0?'#161b22':'#1a1f27';ctx.fillRect(0,y,W,ROW_H);
+    const rh=rowHeights[ri];
+    ctx.fillStyle=ri%2===0?'#1e2330':'#232a3b';
+    ctx.fillRect(0,y,W,rh);
+
     const[,lbl]=statusLabel(inv);
-    const dd=calcDueDate(inv.date,0);
-    const vals=[inv.number,fmtDate(inv.date),fmtDate(dd),fmt(inv.amount),fmt(inv.paid||0),fmt(inv.amount-(inv.paid||0)),lbl];
-    ctx.font='12px Cairo,Arial';
-    vals.forEach((v,i)=>{
-      if(i===5)ctx.fillStyle='#e74c3c';
-      else if(i===4)ctx.fillStyle='#2ecc71';
-      else ctx.fillStyle='#e6edf3';
-      ctx.fillText(v,W-PX-i*colW-colW/2,y+27);
-    });
-    y+=ROW_H;
+    const dd=calcDueDate(inv.date,inv.dueOffset);
+    const ov=isOverdue(inv);
+    const colDates=(inv.collections||[]).map(c=>`${fmtDate(c.date)}: ${fmt(c.amount)}`).join('  |  ');
+
+    const vals=[
+      {t:inv.number,          c:'#cdd6f4'},
+      {t:fmtDate(inv.date),   c:'#cdd6f4'},
+      {t:fmtDate(dd)+(ov?' ⚠':'')+(inv.dueOffset>0?' +'+inv.dueOffset+'يوم':''), c:ov?'#FF2157':'#00b3b3'},
+      {t:fmt(inv.amount),     c:'#cdd6f4'},
+      {t:fmt(inv.paid||0),    c:'#00A63D'},
+      {t:fmt(inv.amount-(inv.paid||0)), c:'#FF2157'},
+      {t:lbl,                 c:lbl==='مسددة'?'#00A63D':lbl.includes('جزئ')?'#f39c12':'#FF2157'}
+    ];
+
+    ctx.font='13px Cairo,Arial'; ctx.textAlign='center'; ctx.direction='rtl';
+    vals.forEach(({t,c},i)=>{ ctx.fillStyle=c; ctx.fillText(t, W-PX-i*colW-colW/2, y+28); });
+
+    // سطر تواريخ التحصيل
+    if(colDates){
+      ctx.font='11px Cairo,Arial'; ctx.fillStyle='#6c7a99';
+      ctx.fillText('📅 '+colDates, W-PX, y+46);
+    }
+    y+=rh;
   });
 
-  // Footer
-  ctx.fillStyle='#0d1117';ctx.fillRect(0,y,W,FOOT_H);
-  ctx.font='12px Cairo,Arial';ctx.fillStyle='#8b949e';ctx.textAlign='center';
-  ctx.fillText('محاسب الوفاء — '+fmtDate(todayStr()),W/2,y+30);
+  // ── Table Footer (totals) ──
+  ctx.fillStyle='#1a2030'; ctx.fillRect(0,y,W,ROW_H);
+  ctx.font='bold 13px Cairo,Arial';
+  ctx.fillStyle='#6c7a99'; ctx.textAlign='center'; ctx.direction='rtl';
+  ctx.fillText('الإجمالي', W-PX-0*colW-colW/2, y+32);
+  ctx.fillStyle='#cdd6f4';
+  ctx.fillText(fmt(totAmt), W-PX-3*colW-colW/2, y+32);
+  ctx.fillStyle='#00A63D';
+  ctx.fillText(fmt(totPaid), W-PX-4*colW-colW/2, y+32);
+  ctx.fillStyle='#FF2157';
+  ctx.fillText(fmt(totDue), W-PX-5*colW-colW/2, y+32);
+  y+=ROW_H;
+
+  // ── Footer ──
+  ctx.fillStyle='#131720'; ctx.fillRect(0,y,W,FOOT_H);
+  ctx.font='12px Cairo,Arial'; ctx.fillStyle='#6c7a99'; ctx.textAlign='center';
+  ctx.fillText('محاسب الوفاء — '+fmtDate(todayStr()), W/2, y+32);
 
   const a=document.createElement('a');
   a.download=`تقرير_${modalClient}_${todayStr()}.png`;
-  a.href=canvas.toDataURL('image/png');a.click();
+  a.href=canvas.toDataURL('image/png'); a.click();
   showToast('✅ تم تحميل الصورة');
+  }
 }
 
 function roundRect(ctx,x,y,w,h,r){
@@ -730,16 +945,13 @@ function addInvoice(){
   if(!amount||amount<=0)return showToast('⚠️ أدخل مبلغاً صحيحاً','error');
   const data=load();
   const newInv={id:nextId(),client,date,amount,number:number||`INV-${data.length+1}`,paid:0,collections:[],createdAt:Date.now()};
-
-  // تحقق من رصيد دائن وطبّقه تلقائياً
   const credit=getCredit(client);
   if(credit>0){
     const apply=Math.min(credit,amount);
     newInv.paid=apply;
     newInv.collections.push({date:todayStr(),amount:apply,note:'رصيد دائن'});
     useCredit(client,apply);
-    data.push(newInv);
-    save(data);
+    data.push(newInv);save(data);
     document.getElementById('inv-client').value='';
     document.getElementById('inv-amount').value='';
     document.getElementById('inv-number').value='';
@@ -747,9 +959,7 @@ function addInvoice(){
     showToast(`✅ تم حفظ الفاتورة وخصم رصيد دائن ${fmt(apply)} جنيه تلقائياً`);
     return;
   }
-
-  data.push(newInv);
-  save(data);
+  data.push(newInv);save(data);
   document.getElementById('inv-client').value='';
   document.getElementById('inv-amount').value='';
   document.getElementById('inv-number').value='';
@@ -764,15 +974,15 @@ function renderInvStats(){
   const rem=total-coll;
   document.getElementById('inv-stats').innerHTML=`
     <div class="stat-card" onclick="showQP('invoices')">
-      <div class="stat-value" style="color:var(--accent)">${data.length}</div>
+      <div class="stat-value" style="color:var(--accent-glow)">${data.length}</div>
       <div class="stat-label">إجمالي الفواتير</div>
     </div>
     <div class="stat-card" onclick="showQP('collected')" title="اضغط لعرض تحصيلات اليوم">
-      <div class="stat-value" style="color:var(--green)">${fmt(coll)}</div>
+      <div class="stat-value" style="color:var(--success)">${fmt(coll)}</div>
       <div class="stat-label">المحصّل (جنيه) 👆</div>
     </div>
     <div class="stat-card" onclick="showQP('remaining')" title="اضغط لعرض الفواتير غير المسددة">
-      <div class="stat-value" style="color:var(--red)">${fmt(rem)}</div>
+      <div class="stat-value" style="color:var(--danger)">${fmt(rem)}</div>
       <div class="stat-label">المتبقي (جنيه) 👆</div>
     </div>`;
 }
@@ -787,7 +997,6 @@ function showQP(type){
   closeQP();
   if(type==='collected'){
     const data=load();
-    // Group by date → then by client
     const dateMap={};
     data.forEach(inv=>{
       (inv.collections||[]).forEach(c=>{
@@ -796,7 +1005,7 @@ function showQP(type){
         dateMap[c.date][inv.client]+=c.amount;
       });
     });
-    const dates=Object.keys(dateMap).sort((a,b)=>b.localeCompare(a)); // newest first
+    const dates=Object.keys(dateMap).sort((a,b)=>b.localeCompare(a));
     let html='';
     if(!dates.length){
       html='<div class="empty" style="padding:20px"><div class="empty-icon">💭</div><div>لا توجد تحصيلات مسجلة</div></div>';
@@ -807,22 +1016,22 @@ function showQP(type){
         const dayTotal=Object.values(clients).reduce((a,b)=>a+b,0);
         const rows=Object.entries(clients).sort((a,b)=>b[1]-a[1]).map(([cl,am])=>`
           <tr>
-            <td><strong style="cursor:pointer;color:var(--accent)" onclick="openClientModal('${esc(cl)}')">${cl}</strong></td>
-            <td style="color:var(--green);font-weight:700;text-align:left">${fmt(am)} جنيه</td>
+            <td><strong style="cursor:pointer;color:var(--accent-glow)" onclick="openClientModal('${esc(cl)}')">${cl}</strong></td>
+            <td style="color:var(--success);font-weight:700;text-align:left">${fmt(am)} جنيه</td>
           </tr>`).join('');
-        return`<div style="margin-bottom:14px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface2);border-radius:8px 8px 0 0;padding:8px 12px;border:1px solid var(--border);border-bottom:none;">
-            <span style="font-weight:700;color:var(--accent);">📅 ${fmtDate(d)}</span>
+        return`<div style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface-2);border-radius:10px 10px 0 0;padding:10px 14px;border-bottom:1px solid var(--border);">
+            <span style="font-weight:700;color:var(--accent-glow);">📅 ${fmtDate(d)}</span>
             <span style="font-size:.82rem;color:var(--gold);font-weight:700;">إجمالي: ${fmt(dayTotal)} جنيه</span>
           </div>
-          <div class="table-wrap" style="border:1px solid var(--border);border-radius:0 0 8px 8px;">
+          <div class="table-wrap" style="border-radius:0 0 10px 10px;">
             <table style="margin:0;">
               <thead><tr><th>العميل</th><th style="text-align:left">المبلغ المحصل</th></tr></thead>
               <tbody>${rows}</tbody>
             </table>
           </div>
         </div>`;
-      }).join('')+`<div style="text-align:left;padding:10px 0;font-size:.85rem;color:var(--muted);">إجمالي كل التحصيلات: <span style="color:var(--gold);font-weight:900;">${fmt(grandTotal)} جنيه</span></div>`;
+      }).join('')+`<div style="text-align:left;padding:10px 0;font-size:.85rem;color:var(--text-muted);">إجمالي كل التحصيلات: <span style="color:var(--gold);font-weight:900;">${fmt(grandTotal)} جنيه</span></div>`;
     }
     document.getElementById('qp-collected-body').innerHTML=html;
     document.getElementById('qp-collected').classList.add('open');
@@ -839,18 +1048,18 @@ function showQP(type){
         <tbody>${data.map(inv=>{
           const[cls,lbl]=statusLabel(inv);const dd=calcDueDate(inv.date,inv.dueOffset);const ov=isOverdue(inv);const offset=inv.dueOffset||0;
           return`<tr>
-            <td><strong style="cursor:pointer;color:var(--accent)" onclick="openClientModal('${esc(inv.client)}')">${inv.client}</strong></td>
+            <td><strong style="cursor:pointer;color:var(--accent-glow)" onclick="openClientModal('${esc(inv.client)}')">${inv.client}</strong></td>
             <td style="direction:ltr;text-align:right;font-size:.8rem">${inv.number}</td>
             <td>${fmtDate(inv.date)}</td>
-            <td style="color:${ov?'var(--red)':'var(--accent)'}">
+            <td style="color:${ov?'var(--danger)':'var(--accent-glow)'}">
               ${fmtDate(dd)}${ov?' ⚠️':''}
               ${offset>0?`<br><small style="color:var(--gold)">مؤجل +${offset}يوم</small>`:''}
             </td>
-            <td style="color:var(--red);font-weight:700">${fmt(inv.amount-(inv.paid||0))}</td>
+            <td style="color:var(--danger);font-weight:700">${fmt(inv.amount-(inv.paid||0))}</td>
             <td><span class="status status-${cls}">${lbl}</span></td>
           </tr>`;}).join('')}
         </tbody>
-        <tfoot><tr><td colspan="4" style="font-weight:700;color:var(--muted)">الإجمالي المتبقي</td><td style="font-weight:900;color:var(--red)">${fmt(total)} جنيه</td><td></td></tr></tfoot>
+        <tfoot><tr><td colspan="4" style="font-weight:700;color:var(--text-muted)">الإجمالي المتبقي</td><td style="font-weight:900;color:var(--danger)">${fmt(total)} جنيه</td><td></td></tr></tfoot>
       </table></div>`;
     }
     document.getElementById('qp-remaining-body').innerHTML=html;
@@ -867,7 +1076,6 @@ function updateDatalist(){
 function populateClientSelect(){
   const data=load();
   const credits=loadCredits();
-  // عملاء بفواتير مفتوحة أو رصيد دائن
   const set=new Set([
     ...data.filter(i=>(i.paid||0)<i.amount).map(i=>i.client),
     ...Object.keys(credits).filter(k=>credits[k]>0)
@@ -890,8 +1098,8 @@ function showClientBalance(){
   const due=invs.reduce((s,i)=>s+(i.amount-(i.paid||0)),0);
   info.style.display='block';
   info.innerHTML=`<div class="client-invoices">
-    ${credit>0?`<div style="background:rgba(46,204,113,.15);border:1px solid rgba(46,204,113,.3);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:.85rem;color:var(--green);font-weight:700">💳 رصيد دائن: ${fmt(credit)} جنيه — سيُخصم تلقائياً من الفاتورة الجاية</div>`:''}
-    ${invs.length?`<div style="font-size:.82rem;color:var(--muted);margin-bottom:8px;font-weight:700">فواتير مفتوحة (${invs.length}) — متبقي: <span style="color:var(--red)">${fmt(due)} جنيه</span></div>
+    ${credit>0?`<div style="background:rgba(0,166,61,.15);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:.85rem;color:var(--success);font-weight:700">💳 رصيد دائن: ${fmt(credit)} جنيه — سيُخصم تلقائياً من الفاتورة الجاية</div>`:''}
+    ${invs.length?`<div style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px;font-weight:700">فواتير مفتوحة (${invs.length}) — متبقي: <span style="color:var(--danger)">${fmt(due)} جنيه</span></div>
     ${invs.map(i=>`<div class="client-row"><span>${fmtDate(i.date)} — ${i.number}</span><span style="color:var(--yellow)">${fmt(i.amount-(i.paid||0))} جنيه</span></div>`).join('')}`:''}
   </div>`;
 }
@@ -901,22 +1109,14 @@ function applyCollection(){
   const colDate=document.getElementById('col-date').value||todayStr();
   if(!client)return showToast('⚠️ اختر العميل','error');
   if(!amount||amount<=0)return showToast('⚠️ أدخل مبلغاً صحيحاً','error');
-
   let data=load();
-  let totalAmount=amount;
-
-  // استخدم الرصيد الدائن أولاً لو موجود
   const existingCredit=getCredit(client);
   if(existingCredit>0){
     const usedCredit=Math.min(existingCredit,amount);
     useCredit(client,usedCredit);
-    // لا نضيفه لـ amount — هو موجود أصلاً في الفواتير من قبل
     showToast(`💳 تم استخدام رصيد دائن: ${fmt(usedCredit)} جنيه`);
   }
-
   const unpaid=data.filter(i=>i.client===client&&(i.paid||0)<i.amount).sort((a,b)=>a.date.localeCompare(b.date));
-
-  // لو مفيش فواتير مفتوحة — المبلغ كله رصيد دائن
   if(!unpaid.length){
     addCredit(client,amount,colDate);
     save(data);
@@ -926,7 +1126,6 @@ function applyCollection(){
     showClientBalance();
     return;
   }
-
   let rem=amount,touched=0;
   for(const inv of unpaid){
     if(rem<=0)break;
@@ -936,8 +1135,6 @@ function applyCollection(){
     data[idx].collections.push({date:colDate,amount:apply});
     rem-=apply;touched++;
   }
-
-  // لو في زيادة — احفظها كرصيد دائن
   if(rem>0){
     addCredit(client,rem,colDate);
     save(data);
@@ -965,46 +1162,38 @@ function renderReport(){
   const selDate=document.getElementById('report-date-filter').value||today;
   const isToday=selDate===today;
   const data=load();
-
-  // فواتير موعدها = selDate (مستحقة في هذا اليوم)
   const todayInvs=data.filter(i=>calcDueDate(i.date,i.dueOffset)===selDate&&(i.paid||0)<i.amount).map(i=>({...i,_type:'today'}));
-  // فواتير متأخرة: موعدها قبل selDate ولم تسدد (فقط لو التاريخ المختار = اليوم الفعلي)
   const overdueInvs=isToday
     ? data.filter(i=>calcDueDate(i.date,i.dueOffset)<today&&(i.paid||0)<i.amount).map(i=>({...i,_type:'overdue'}))
     : [];
-
   const all=[...overdueInvs,...todayInvs].sort((a,b)=>a.date.localeCompare(b.date));
-
   const lbl=isToday?`اليوم: ${fmtDate(selDate)}`:`📅 ${fmtDate(selDate)}`;
   document.getElementById('report-today-lbl').textContent=lbl;
   document.getElementById('snap-date-lbl').textContent=`تاريخ التقرير: ${fmtDate(selDate)}`;
   document.getElementById('snap-count-lbl').textContent=isToday
     ?`اليوم: ${todayInvs.length} | متأخرة: ${overdueInvs.length}`
     :`مستحق في هذا اليوم: ${todayInvs.length}`;
-
   const body=document.getElementById('daily-report-body');
   if(!all.length){
     body.innerHTML=`<div class="empty"><div class="empty-icon">${isToday?'🎉':'📭'}</div><div>${isToday?'لا يوجد تحصيل مطلوب اليوم':'لا توجد فواتير مستحقة في هذا التاريخ'}</div></div>`;
     return;
   }
-
   const totToday=todayInvs.reduce((s,i)=>s+(i.amount-(i.paid||0)),0);
   const totOverdue=overdueInvs.reduce((s,i)=>s+(i.amount-(i.paid||0)),0);
   const totAll=totToday+totOverdue;
-
   body.innerHTML=`
-    ${overdueInvs.length>0?`<div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
-      <div style="flex:1;min-width:120px;background:rgba(0,180,216,.1);border:1px solid rgba(0,180,216,.3);border-radius:8px;padding:10px 14px;text-align:center">
-        <div style="font-weight:900;color:var(--accent);font-size:1.1rem">${fmt(totToday)}</div>
-        <div style="font-size:.75rem;color:var(--muted)">📅 مطلوب اليوم</div>
+    ${overdueInvs.length>0?`<div class="day-stat-row">
+      <div class="day-stat">
+        <div class="day-stat-val" style="color:var(--accent-glow)">${fmt(totToday)}</div>
+        <div class="day-stat-lbl">📅 مطلوب اليوم</div>
       </div>
-      <div style="flex:1;min-width:120px;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.3);border-radius:8px;padding:10px 14px;text-align:center">
-        <div style="font-weight:900;color:var(--red);font-size:1.1rem">${fmt(totOverdue)}</div>
-        <div style="font-size:.75rem;color:var(--muted)">⚠️ متأخر</div>
+      <div class="day-stat">
+        <div class="day-stat-val" style="color:var(--danger)">${fmt(totOverdue)}</div>
+        <div class="day-stat-lbl">⚠️ متأخر</div>
       </div>
-      <div style="flex:1;min-width:120px;background:rgba(244,162,97,.1);border:1px solid rgba(244,162,97,.3);border-radius:8px;padding:10px 14px;text-align:center">
-        <div style="font-weight:900;color:var(--gold);font-size:1.1rem">${fmt(totAll)}</div>
-        <div style="font-size:.75rem;color:var(--muted)">💰 الإجمالي</div>
+      <div class="day-stat">
+        <div class="day-stat-val" style="color:var(--gold)">${fmt(totAll)}</div>
+        <div class="day-stat-lbl">💰 الإجمالي</div>
       </div>
     </div>`:''}
     <div class="table-wrap"><table>
@@ -1014,24 +1203,24 @@ function renderReport(){
       const dd=calcDueDate(inv.date,inv.dueOffset);
       const isOv=inv._type==='overdue';
       const daysLate=isOv?Math.floor((new Date(today)-new Date(dd))/864e5):0;
-      return`<tr style="${isOv?'background:rgba(231,76,60,.04)':''}">
+      return`<tr style="${isOv?'background:rgba(255,33,87,.04)':''}">
         <td>${i+1}</td>
-        <td>${isOv?`<span style="color:var(--red);font-size:.78rem;font-weight:700">⚠️ متأخر<br>${daysLate}يوم</span>`:`<span style="color:var(--accent);font-size:.78rem;font-weight:700">📅 اليوم</span>`}</td>
-        <td><strong style="cursor:pointer;color:var(--accent)" onclick="openClientModal('${esc(inv.client)}')">${inv.client}</strong></td>
+        <td>${isOv?`<span style="color:var(--danger);font-size:.78rem;font-weight:700">⚠️ متأخر<br>${daysLate}يوم</span>`:`<span style="color:var(--accent-glow);font-size:.78rem;font-weight:700">📅 اليوم</span>`}</td>
+        <td><strong style="cursor:pointer;color:var(--accent-glow)" onclick="openClientModal('${esc(inv.client)}')">${inv.client}</strong></td>
         <td style="direction:ltr;text-align:right">${inv.number}</td>
         <td>${fmtDate(inv.date)}</td>
-        <td style="color:${isOv?'var(--red)':'var(--accent)'}">${fmtDate(dd)}${(inv.dueOffset||0)>0?` <span style="font-size:.7rem;color:var(--gold)">+${inv.dueOffset}يوم</span>`:''}</td>
-        <td style="color:${isOv?'var(--red)':'var(--text)'};font-weight:700">${fmt(inv.amount-(inv.paid||0))}</td>
+        <td style="color:${isOv?'var(--danger)':'var(--accent-glow)'}">${fmtDate(dd)}${(inv.dueOffset||0)>0?` <span style="font-size:.7rem;color:var(--gold)">+${inv.dueOffset}يوم</span>`:''}</td>
+        <td style="color:${isOv?'var(--danger)':'var(--text)'};font-weight:700">${fmt(inv.amount-(inv.paid||0))}</td>
         <td><span class="status status-${cls}">${lbl}</span></td>
-        <td><button class="btn btn-sm btn-outline" style="padding:4px 8px;font-size:.75rem;color:var(--gold);border-color:var(--gold)" onclick="openPostpone('${inv.id}')">⏳</button></td>
+        <td><button class="btn btn-sm btn-outline" style="padding:5px 10px;font-size:.75rem;color:var(--gold)" onclick="openPostpone('${inv.id}')">⏳</button></td>
       </tr>`;}).join('')}</tbody>
     <tfoot><tr>
-      <td colspan="6" style="font-weight:700;color:var(--muted)">الإجمالي الكلي المطلوب</td>
+      <td colspan="6" style="font-weight:700;color:var(--text-muted)">الإجمالي الكلي المطلوب</td>
       <td style="font-weight:900;color:var(--gold)">${fmt(totAll)}</td>
       <td></td><td></td>
     </tr></tfoot>
   </table></div>
-  <div style="margin-top:12px;font-size:.75rem;color:var(--muted);text-align:center">محاسب الوفاء — ${fmtDate(today)}</div>`;
+  <div style="margin-top:14px;font-size:.75rem;color:var(--text-muted);text-align:center">محاسب الوفاء — ${fmtDate(today)}</div>`;
 }
 
 // ═══ POSTPONE ═══
@@ -1042,15 +1231,13 @@ function openPostpone(id){
   const data=load();
   const inv=data.find(i=>i.id===id);
   if(!inv)return;
-  ppInvId=id;
-  ppMode='days';
+  ppInvId=id;ppMode='days';
   const currentDue=calcDueDate(inv.date,inv.dueOffset);
   document.getElementById('pp-client-lbl').textContent=`${inv.client} — ${inv.number}`;
   document.getElementById('pp-current-due').textContent=fmtDate(currentDue);
   document.getElementById('pp-new-due').textContent='—';
   document.getElementById('pp-days-input').value='';
   document.getElementById('pp-date-input').value='';
-  // reset tabs
   document.querySelectorAll('.p-tab').forEach((t,i)=>{t.classList.toggle('active',i===0);});
   document.getElementById('pp-days-section').classList.add('open');
   document.getElementById('pp-date-section').classList.remove('open');
@@ -1090,7 +1277,6 @@ function previewNewDue(){
   document.getElementById('pp-new-due').textContent=newDue?fmtDate(newDue):'—';
 }
 
-// live preview on input
 document.addEventListener('input',e=>{
   if(e.target.id==='pp-days-input'||e.target.id==='pp-date-input')previewNewDue();
 });
@@ -1102,28 +1288,22 @@ function applyPostpone(){
   if(idx===-1)return;
   const inv=data[idx];
   const currentOffset=inv.dueOffset||0;
-
   if(ppMode==='days'){
     const d=parseInt(document.getElementById('pp-days-input').value);
     if(!d||d<=0)return showToast('⚠️ أدخل عدد أيام صحيح','error');
     data[idx].dueOffset=(currentOffset+d);
     const newDue=calcDueDate(inv.date,data[idx].dueOffset);
-    save(data);
-    closePostpone();
-    renderReport();updateBadges();
+    save(data);closePostpone();renderReport();updateBadges();
     showToast(`✅ تم التأجيل — موعد التحصيل الجديد: ${fmtDate(newDue)}`);
   }else{
     const newDate=document.getElementById('pp-date-input').value;
     if(!newDate)return showToast('⚠️ اختر تاريخاً','error');
     if(newDate<=todayStr())return showToast('⚠️ التاريخ يجب أن يكون بعد اليوم','error');
-    // احسب الـ offset من تاريخ الفاتورة الأصلي
     const baseDue=calcDueDate(inv.date,0);
     const diffMs=new Date(newDate)-new Date(baseDue);
     const diffDays=Math.round(diffMs/864e5);
     data[idx].dueOffset=diffDays;
-    save(data);
-    closePostpone();
-    renderReport();updateBadges();
+    save(data);closePostpone();renderReport();updateBadges();
     showToast(`✅ تم التأجيل — موعد التحصيل الجديد: ${fmtDate(newDate)}`);
   }
 }
@@ -1153,18 +1333,18 @@ function exportReportExcel(){
 async function captureReport(){
   const el=document.getElementById('report-snap');
   if(typeof html2canvas!=='undefined'){
-    const c=await html2canvas(el,{backgroundColor:'#161b22',scale:2});
+    const c=await html2canvas(el,{backgroundColor:'#1e2330',scale:2});
     const a=document.createElement('a');a.download=`تقرير_يومي_${todayStr()}.png`;a.href=c.toDataURL();a.click();
     showToast('✅ تم تحميل الصورة');return;
   }
   const due=load().filter(i=>calcDueDate(i.date,0)===todayStr()&&(i.paid||0)<i.amount);
   if(!due.length)return showToast('لا يوجد بيانات','error');
-  const W=900,PX=32,ROW_H=44,HEAD_H=110,FOOT_H=60;
+  const W=1000,PX=32,ROW_H=44,HEAD_H=110,FOOT_H=60;
   const H=HEAD_H+(due.length+2)*ROW_H+FOOT_H;
   const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
   const ctx=canvas.getContext('2d');
-  ctx.fillStyle='#161b22';ctx.fillRect(0,0,W,H);
-  const gr=ctx.createLinearGradient(0,0,W,0);gr.addColorStop(0,'#0077b6');gr.addColorStop(1,'#023e8a');
+  ctx.fillStyle='#1e2330';ctx.fillRect(0,0,W,H);
+  const gr=ctx.createLinearGradient(0,0,W,0);gr.addColorStop(0,'#006666');gr.addColorStop(1,'#023e8a');
   ctx.fillStyle=gr;ctx.fillRect(0,0,W,HEAD_H-20);
   ctx.font='bold 24px Cairo,Arial';ctx.fillStyle='#fff';ctx.textAlign='right';ctx.direction='rtl';
   ctx.fillText('التقرير اليومي — فرع الوفاء',W-PX,42);
@@ -1172,66 +1352,33 @@ async function captureReport(){
   ctx.fillText(`تاريخ: ${fmtDate(todayStr())}`,W-PX,70);
   const cols=['العميل','رقم الفاتورة','تاريخ الفاتورة','المبلغ','المتبقي','الحالة'];
   const colW=(W-PX*2)/cols.length;let y=HEAD_H;
-  ctx.fillStyle='#1c2330';ctx.fillRect(0,y,W,ROW_H);
-  ctx.font='bold 13px Cairo,Arial';ctx.fillStyle='#8b949e';
+  ctx.fillStyle='#1a2030';ctx.fillRect(0,y,W,ROW_H);
+  ctx.font='bold 13px Cairo,Arial';ctx.fillStyle='#6c7a99';
   cols.forEach((c,i)=>ctx.fillText(c,W-PX-i*colW-colW/2,y+27));y+=ROW_H;
   due.forEach((inv,ri)=>{
-    ctx.fillStyle=ri%2===0?'#161b22':'#1a1f27';ctx.fillRect(0,y,W,ROW_H);
+    ctx.fillStyle=ri%2===0?'#1e2330':'#232a3b';ctx.fillRect(0,y,W,ROW_H);
     const[,lbl]=statusLabel(inv);
     const vals=[inv.client,inv.number,fmtDate(inv.date),fmt(inv.amount),fmt(inv.amount-(inv.paid||0)),lbl];
     ctx.font='13px Cairo,Arial';
-    vals.forEach((v,i)=>{ctx.fillStyle=i===4?'#e74c3c':'#e6edf3';ctx.fillText(v,W-PX-i*colW-colW/2,y+27);});
+    vals.forEach((v,i)=>{ctx.fillStyle=i===4?'#FF2157':'#cdd6f4';ctx.fillText(v,W-PX-i*colW-colW/2,y+27);});
     y+=ROW_H;
   });
-  ctx.fillStyle='#0d1117';ctx.fillRect(0,y,W,FOOT_H);
-  ctx.font='12px Cairo,Arial';ctx.fillStyle='#8b949e';ctx.textAlign='center';
+  ctx.fillStyle='#131720';ctx.fillRect(0,y,W,FOOT_H);
+  ctx.font='12px Cairo,Arial';ctx.fillStyle='#6c7a99';ctx.textAlign='center';
   ctx.fillText(`محاسب الوفاء — ${fmtDate(todayStr())}`,W/2,y+35);
   const a=document.createElement('a');a.download=`تقرير_يومي_${todayStr()}.png`;a.href=canvas.toDataURL('image/png');a.click();
   showToast('✅ تم تحميل الصورة');
-}
-
-// ═══ OVERDUE ═══
-function renderOverdue(){
-  const overdue=load().filter(isOverdue).sort((a,b)=>a.date.localeCompare(b.date));
-  const body=document.getElementById('overdue-body');
-  if(!overdue.length){body.innerHTML='<div class="empty"><div class="empty-icon">✅</div><div>لا توجد فواتير متأخرة</div></div>';return;}
-  const totDue=overdue.reduce((s,i)=>s+(i.amount-(i.paid||0)),0);
-  const today=todayStr();
-  body.innerHTML=`
-    <div class="card" style="border-color:rgba(231,76,60,.3);margin-bottom:16px">
-      <div class="stats-grid" style="margin-bottom:0">
-        <div class="stat-card" style="cursor:default"><div class="stat-value" style="color:var(--red)">${overdue.length}</div><div class="stat-label">فاتورة متأخرة</div></div>
-        <div class="stat-card" style="cursor:default"><div class="stat-value" style="color:var(--red)">${[...new Set(overdue.map(i=>i.client))].length}</div><div class="stat-label">عميل</div></div>
-        <div class="stat-card" style="cursor:default"><div class="stat-value" style="color:var(--red)">${fmt(totDue)}</div><div class="stat-label">إجمالي المتأخر</div></div>
-      </div>
-    </div>
-    <div class="table-wrap"><table>
-      <thead><tr><th>العميل</th><th>رقم الفاتورة</th><th>تاريخ الفاتورة</th><th>موعد التحصيل</th><th>تأخر (أيام)</th><th>المتبقي</th></tr></thead>
-      <tbody>${overdue.map(inv=>{
-        const dd=calcDueDate(inv.date,0);
-        const late=Math.floor((new Date(today)-new Date(dd))/864e5);
-        return`<tr>
-          <td><strong style="cursor:pointer;color:var(--accent)" onclick="openClientModal('${esc(inv.client)}')">${inv.client}</strong></td>
-          <td style="direction:ltr;text-align:right">${inv.number}</td>
-          <td>${fmtDate(inv.date)}</td>
-          <td style="color:var(--red)">${fmtDate(dd)}</td>
-          <td style="color:var(--red);font-weight:700;text-align:center">${late}</td>
-          <td style="color:var(--red);font-weight:700">${fmt(inv.amount-(inv.paid||0))}</td>
-        </tr>`;}).join('')}
-      </tbody>
-    </table></div>`;
 }
 
 // ═══ ALL — CHECKBOX FILTER ═══
 function onChkAll(){
   const all=document.getElementById('chk-all').checked;
   ['unpaid','partial','paid'].forEach(k=>document.getElementById('chk-'+k).checked=false);
-  if(!all)document.getElementById('chk-all').checked=true; // keep at least one
+  if(!all)document.getElementById('chk-all').checked=true;
   updateChkStyles();renderAll();
 }
 function onChkFilter(){
   document.getElementById('chk-all').checked=false;
-  // If none selected, revert to all
   const any=['unpaid','partial','paid'].some(k=>document.getElementById('chk-'+k).checked);
   if(!any)document.getElementById('chk-all').checked=true;
   updateChkStyles();renderAll();
@@ -1265,14 +1412,14 @@ function renderAll(){
     <tbody>${data.map(inv=>{
       const[cls,lbl]=statusLabel(inv);const dd=calcDueDate(inv.date,inv.dueOffset);const ov=isOverdue(inv);const offset=inv.dueOffset||0;
       return`<tr>
-        <td><strong style="cursor:pointer;color:var(--accent)" onclick="openClientModal('${esc(inv.client)}')">${inv.client}</strong><br><small style="color:var(--muted)">${inv.number}</small></td>
+        <td><strong style="cursor:pointer;color:var(--accent-glow)" onclick="openClientModal('${esc(inv.client)}')">${inv.client}</strong><br><small style="color:var(--text-muted)">${inv.number}</small></td>
         <td>${fmtDate(inv.date)}</td>
-        <td style="color:${ov?'var(--red)':'var(--accent)'}">
+        <td style="color:${ov?'var(--danger)':'var(--accent-glow)'}">
           ${fmtDate(dd)}${ov?' ⚠️':''}
           ${offset>0?`<br><small style="color:var(--gold)">مؤجل +${offset}يوم</small>`:''}
         </td>
         <td>${fmt(inv.amount)}</td>
-        <td style="color:var(--green)">${fmt(inv.paid||0)}</td>
+        <td style="color:var(--success)">${fmt(inv.paid||0)}</td>
         <td><span class="status status-${cls}">${lbl}</span></td>
         <td><button class="btn btn-sm btn-danger" onclick="deleteInvoice('${inv.id}')">🗑</button></td>
       </tr>`;}).join('')}
