@@ -1339,43 +1339,172 @@ function exportReportExcel(){
   showToast('✅ تم تحميل Excel');
 }
 
-async function captureReport(){
-  const el=document.getElementById('report-snap');
-  if(typeof html2canvas!=='undefined'){
-    const c=await html2canvas(el,{backgroundColor:'#1e2330',scale:2});
-    const a=document.createElement('a');a.download=`تقرير_يومي_${todayStr()}.png`;a.href=c.toDataURL();a.click();
-    showToast('✅ تم تحميل الصورة');return;
-  }
-  const due=load().filter(i=>calcDueDate(i.date,0)===todayStr()&&(i.paid||0)<i.amount);
-  if(!due.length)return showToast('لا يوجد بيانات','error');
-  const W=1000,PX=32,ROW_H=44,HEAD_H=110,FOOT_H=60;
-  const H=HEAD_H+(due.length+2)*ROW_H+FOOT_H;
-  const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
+function captureReport(){
+  const today=todayStr();
+  const selDate=document.getElementById('report-date-filter').value||today;
+  const isToday=selDate===today;
+  const data=load();
+
+  const todayInvs=data.filter(i=>calcDueDate(i.date,i.dueOffset)===selDate&&(i.paid||0)<i.amount).map(i=>({...i,_type:'today'}));
+  const overdueInvs=isToday
+    ? data.filter(i=>calcDueDate(i.date,i.dueOffset)<today&&(i.paid||0)<i.amount).map(i=>({...i,_type:'overdue'}))
+    : [];
+  const all=[...overdueInvs,...todayInvs].sort((a,b)=>a.date.localeCompare(b.date));
+  if(!all.length)return showToast('لا توجد بيانات للتصدير','error');
+
+  const totToday =todayInvs.reduce((s,i)=>s+(i.amount-(i.paid||0)),0);
+  const totOverdue=overdueInvs.reduce((s,i)=>s+(i.amount-(i.paid||0)),0);
+  const totAll   =totToday+totOverdue;
+
+  /* ── Pure Canvas ── */
+  const SC=2, W=1200, PX=36;
+  const HDR_H =90;
+  const SUMM_H=overdueInvs.length>0?70:0; // شريط إجماليات
+  const TH_H  =46;
+  const ROW_H =50;
+  const FOOT_H=56;
+  const H=HDR_H+SUMM_H+TH_H+all.length*ROW_H+ROW_H+FOOT_H+10;
+
+  const canvas=document.createElement('canvas');
+  canvas.width=W*SC; canvas.height=H*SC;
   const ctx=canvas.getContext('2d');
-  ctx.fillStyle='#1e2330';ctx.fillRect(0,0,W,H);
-  const gr=ctx.createLinearGradient(0,0,W,0);gr.addColorStop(0,'#006666');gr.addColorStop(1,'#023e8a');
-  ctx.fillStyle=gr;ctx.fillRect(0,0,W,HEAD_H-20);
-  ctx.font='bold 24px Cairo,Arial';ctx.fillStyle='#fff';ctx.textAlign='right';ctx.direction='rtl';
-  ctx.fillText('التقرير اليومي — فرع الوفاء',W-PX,42);
-  ctx.font='15px Cairo,Arial';ctx.fillStyle='rgba(255,255,255,.7)';
-  ctx.fillText(`تاريخ: ${fmtDate(todayStr())}`,W-PX,70);
-  const cols=['العميل','رقم الفاتورة','تاريخ الفاتورة','المبلغ','المتبقي','الحالة'];
-  const colW=(W-PX*2)/cols.length;let y=HEAD_H;
-  ctx.fillStyle='#1a2030';ctx.fillRect(0,y,W,ROW_H);
-  ctx.font='bold 13px Cairo,Arial';ctx.fillStyle='#6c7a99';
-  cols.forEach((c,i)=>ctx.fillText(c,W-PX-i*colW-colW/2,y+27));y+=ROW_H;
-  due.forEach((inv,ri)=>{
-    ctx.fillStyle=ri%2===0?'#1e2330':'#232a3b';ctx.fillRect(0,y,W,ROW_H);
-    const[,lbl]=statusLabel(inv);
-    const vals=[inv.client,inv.number,fmtDate(inv.date),fmt(inv.amount),fmt(inv.amount-(inv.paid||0)),lbl];
-    ctx.font='13px Cairo,Arial';
-    vals.forEach((v,i)=>{ctx.fillStyle=i===4?'#FF2157':'#cdd6f4';ctx.fillText(v,W-PX-i*colW-colW/2,y+27);});
-    y+=ROW_H;
+  ctx.scale(SC,SC);
+
+  /* helpers */
+  function rrFill(x,y,w,h,r,fill){
+    ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
+    ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);
+    ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+    ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);
+    ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+    ctx.fillStyle=fill;ctx.fill();
+  }
+  function clip(txt,maxPx){
+    while(ctx.measureText(txt).width>maxPx&&txt.length>3)txt=txt.slice(0,-1);
+    return txt;
+  }
+
+  /* ── خلفية */
+  ctx.fillStyle='#1e2330'; ctx.fillRect(0,0,W,H);
+
+  /* ── HEADER gradient */
+  const gr=ctx.createLinearGradient(0,0,W,0);
+  gr.addColorStop(0,'#006666'); gr.addColorStop(1,'#023e8a');
+  ctx.fillStyle=gr; ctx.fillRect(0,0,W,HDR_H-8);
+  ctx.direction='rtl'; ctx.textAlign='right';
+  ctx.font='bold 26px Cairo,Arial'; ctx.fillStyle='#fff';
+  ctx.fillText('📋 تحصيلات اليوم — فرع الوفاء', W-PX, 40);
+  ctx.font='14px Cairo,Arial'; ctx.fillStyle='rgba(255,255,255,.75)';
+  ctx.fillText('تاريخ التقرير: '+fmtDate(selDate)+'   |   اليوم: '+todayInvs.length+'   متأخرة: '+overdueInvs.length, W-PX, 66);
+
+  let cy=HDR_H;
+
+  /* ── SUMMARY BAR (لو فيه متأخرات) */
+  if(overdueInvs.length>0){
+    const bw=Math.floor((W-PX*2-20)/3);
+    const items=[
+      ['📅 مطلوب اليوم',fmt(totToday),'#00b3b3'],
+      ['⚠️ متأخر',fmt(totOverdue),'#FF2157'],
+      ['💰 الإجمالي',fmt(totAll),'#f4a261'],
+    ];
+    items.forEach((it,i)=>{
+      const bx=PX+i*(bw+10), by=cy+6;
+      rrFill(bx,by,bw,SUMM_H-12,10,'#232a3b');
+      ctx.font='bold 18px Cairo,Arial'; ctx.fillStyle=it[2]; ctx.textAlign='center'; ctx.direction='ltr';
+      ctx.fillText(it[1], bx+bw/2, by+30);
+      ctx.font='11px Cairo,Arial'; ctx.fillStyle='#6c7a99';
+      ctx.fillText(it[0], bx+bw/2, by+50);
+    });
+    cy+=SUMM_H;
+  }
+
+  /* ── COLS تعريف */
+  const colDefs=[
+    {lbl:'#',              fr:0.04},
+    {lbl:'النوع',          fr:0.09},
+    {lbl:'العميل',         fr:0.14},
+    {lbl:'رقم الفاتورة',  fr:0.11},
+    {lbl:'تاريخ الفاتورة',fr:0.11},
+    {lbl:'موعد التحصيل',  fr:0.12},
+    {lbl:'المتبقي',        fr:0.11},
+    {lbl:'الحالة',         fr:0.15},
+    {lbl:'',               fr:0.13}, // فراغ آخر
+  ];
+  const TW=W-PX*2;
+  function colCX(i){ return W-PX-colDefs.slice(0,i).reduce((s,c)=>s+c.fr*TW,0)-colDefs[i].fr*TW/2; }
+  function colMaxW(i){ return colDefs[i].fr*TW-8; }
+
+  /* ── TABLE HEADER */
+  ctx.fillStyle='#1a2030'; ctx.fillRect(PX,cy,TW,TH_H);
+  ctx.font='bold 11px Cairo,Arial'; ctx.fillStyle='#6c7a99';
+  ctx.textAlign='center'; ctx.direction='rtl';
+  colDefs.forEach((c,i)=>{ if(c.lbl) ctx.fillText(c.lbl, colCX(i), cy+29); });
+  ctx.strokeStyle='#2a3044'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(PX,cy+TH_H); ctx.lineTo(W-PX,cy+TH_H); ctx.stroke();
+  cy+=TH_H;
+
+  /* ── TABLE ROWS */
+  const sColor={paid:'#00A63D',partial:'#f39c12',unpaid:'#FF2157'};
+  all.forEach((inv,ri)=>{
+    const[cls,lbl]=statusLabel(inv);
+    const dd=calcDueDate(inv.date,inv.dueOffset);
+    const isOv=inv._type==='overdue';
+    const daysLate=isOv?Math.floor((new Date(today)-new Date(dd))/864e5):0;
+    const rem=inv.amount-(inv.paid||0);
+
+    ctx.fillStyle=isOv?'rgba(255,33,87,.05)':(ri%2===0?'#1e2330':'#232a3b');
+    ctx.fillRect(PX,cy,TW,ROW_H);
+
+    const cells=[
+      {t:''+(ri+1),          c:'#6c7a99'},
+      {t:isOv?'⚠️ متأخر\n'+daysLate+'يوم':'📅 اليوم', c:isOv?'#FF2157':'#00b3b3'},
+      {t:inv.client,         c:'#00b3b3'},
+      {t:inv.number,         c:'#cdd6f4'},
+      {t:fmtDate(inv.date),  c:'#cdd6f4'},
+      {t:fmtDate(dd)+((inv.dueOffset||0)>0?' +'+inv.dueOffset+'د':''), c:isOv?'#FF2157':'#00b3b3'},
+      {t:fmt(rem),           c:isOv?'#FF2157':'#cdd6f4'},
+      {t:lbl,                c:sColor[cls]},
+      {t:'',                 c:'#cdd6f4'},
+    ];
+
+    ctx.font='12px Cairo,Arial'; ctx.textAlign='center'; ctx.direction='rtl';
+    cells.forEach((cell,i)=>{
+      ctx.fillStyle=cell.c;
+      // النوع: نعمله سطرين
+      if(i===1&&isOv){
+        ctx.font='11px Cairo,Arial';
+        ctx.fillText('⚠️ متأخر', colCX(i), cy+ROW_H/2);
+        ctx.fillStyle='#ff8a8a';
+        ctx.fillText(daysLate+' يوم', colCX(i), cy+ROW_H/2+14);
+        ctx.font='12px Cairo,Arial';
+      } else {
+        const txt=clip(cell.t, colMaxW(i));
+        ctx.fillText(txt, colCX(i), cy+ROW_H/2+5);
+      }
+    });
+
+    ctx.strokeStyle='#2a3044'; ctx.lineWidth=.5;
+    ctx.beginPath(); ctx.moveTo(PX,cy+ROW_H); ctx.lineTo(W-PX,cy+ROW_H); ctx.stroke();
+    cy+=ROW_H;
   });
-  ctx.fillStyle='#131720';ctx.fillRect(0,y,W,FOOT_H);
-  ctx.font='12px Cairo,Arial';ctx.fillStyle='#6c7a99';ctx.textAlign='center';
-  ctx.fillText(`محاسب الوفاء — ${fmtDate(todayStr())}`,W/2,y+35);
-  const a=document.createElement('a');a.download=`تقرير_يومي_${todayStr()}.png`;a.href=canvas.toDataURL('image/png');a.click();
+
+  /* ── TOTALS ROW */
+  ctx.fillStyle='#1a2030'; ctx.fillRect(PX,cy,TW,ROW_H);
+  ctx.font='bold 13px Cairo,Arial'; ctx.textAlign='center'; ctx.direction='rtl';
+  ctx.fillStyle='#6c7a99'; ctx.fillText('الإجمالي الكلي المطلوب', colCX(2), cy+ROW_H/2+5);
+  ctx.fillStyle='#f4a261';  ctx.fillText(fmt(totAll), colCX(6), cy+ROW_H/2+5);
+  cy+=ROW_H;
+
+  /* ── FOOTER */
+  ctx.fillStyle='#131720'; ctx.fillRect(0,cy,W,FOOT_H+10);
+  ctx.font='12px Cairo,Arial'; ctx.fillStyle='#6c7a99';
+  ctx.textAlign='center'; ctx.direction='ltr';
+  ctx.fillText('محاسب الوفاء  —  '+fmtDate(today), W/2, cy+30);
+
+  /* ── تحميل */
+  const a=document.createElement('a');
+  a.download=`تقرير_يومي_${selDate}.png`;
+  a.href=canvas.toDataURL('image/png'); a.click();
   showToast('✅ تم تحميل الصورة');
 }
 
