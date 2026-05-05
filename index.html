@@ -892,12 +892,21 @@ async function captureClientReport(){
     ];
 
     ctx.font='13px Cairo,Arial'; ctx.textAlign='center'; ctx.direction='rtl';
-    vals.forEach(({t,c},i)=>{ ctx.fillStyle=c; ctx.fillText(t, W-PX-i*colW-colW/2, y+28); });
+    vals.forEach(({t,c},i)=>{
+      ctx.fillStyle=c;
+      // عمود المدفوع (index 4): لو فيه تواريخ نرفع المبلغ للسطر العلوي
+      const lineY=(i===4&&colDates)?y+20:y+Math.round(rh/2)+5;
+      ctx.fillText(t, W-PX-i*colW-colW/2, lineY);
+    });
 
-    // سطر تواريخ التحصيل
+    // تاريخ التحصيل تحت المبلغ في نفس عمود المدفوع (col index 4)
     if(colDates){
-      ctx.font='11px Cairo,Arial'; ctx.fillStyle='#6c7a99';
-      ctx.fillText('📅 '+colDates, W-PX, y+46);
+      const cx=W-PX-4*colW-colW/2;
+      ctx.font='10px Cairo,Arial'; ctx.fillStyle='#6c7a99';
+      ctx.textAlign='center'; ctx.direction='rtl';
+      let dTxt='📅 '+colDates;
+      while(ctx.measureText(dTxt).width>colW-6&&dTxt.length>6) dTxt=dTxt.slice(0,-1);
+      ctx.fillText(dTxt, cx, y+38);
     }
     y+=rh;
   });
