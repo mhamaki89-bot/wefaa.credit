@@ -734,7 +734,11 @@ function renderModalBody(name){
     const paid=inv.paid||0;
     const rem=inv.amount-paid;
     const offset=inv.dueOffset||0;
-    const colDates=(inv.collections||[]).map(c=>`${fmtDate(c.date)}: ${fmt(c.amount)} جنيه`).join(' | ');
+    const colLines=(inv.collections||[]).map(c=>
+      `<div style="display:flex;justify-content:space-between;gap:8px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+        <span style="color:#6c7a99;font-size:.72rem">📅 ${fmtDate(c.date)}</span>
+        <span style="color:var(--success);font-size:.78rem;font-weight:700">${fmt(c.amount)} ج</span>
+      </div>`).join('');
     return`<tr>
       <td style="direction:ltr;text-align:right">${inv.number}</td>
       <td>${fmtDate(inv.date)}</td>
@@ -744,8 +748,8 @@ function renderModalBody(name){
       </td>
       <td>${fmt(inv.amount)}</td>
       <td>
-        <div style="color:var(--success);font-weight:600">${fmt(paid)}</div>
-        ${colDates?`<div class="col-dates">📅 ${colDates}</div>`:''}
+        <div style="color:var(--success);font-weight:700;margin-bottom:${colLines?'4px':'0'}">${fmt(paid)}</div>
+        ${colLines?`<div style="min-width:130px">${colLines}</div>`:''}
       </td>
       <td style="color:var(--danger);font-weight:700">${fmt(rem)}</td>
       <td><span class="status status-${cls}">${lbl}</span></td>
@@ -809,10 +813,14 @@ async function captureClientReport(){
   const W=1100, PX=36, ROW_H=52, ROW_H2=70 /* صف فيه تواريخ تحصيل */;
   const HEAD_H=200, STAT_H=80, FOOT_H=56;
 
-  // احسب ارتفاع كل صف (بعض الفواتير فيها سطر تاني للتواريخ)
-  const rowHeights=invs.map(inv=>(inv.collections&&inv.collections.length>0)?ROW_H2:ROW_H);
+  // احسب ارتفاع كل صف بناءً على عدد التحصيلات الفعلي
+  const BASE_ROW=48, COL_LINE=18;
+  const rowHeights=invs.map(inv=>{
+    const n=(inv.collections||[]).length;
+    return n>0 ? BASE_ROW+n*COL_LINE : BASE_ROW;
+  });
   const tableH=rowHeights.reduce((s,h)=>s+h,0);
-  const H=HEAD_H+STAT_H+ROW_H+tableH+ROW_H+FOOT_H; // header+stats+thead+rows+tfoot+footer
+  const H=HEAD_H+STAT_H+ROW_H+tableH+ROW_H+FOOT_H;
 
   const canvas=document.createElement('canvas');
   canvas.width=W*2; canvas.height=H*2; // scale x2 for sharpness
@@ -879,7 +887,7 @@ async function captureClientReport(){
     const[,lbl]=statusLabel(inv);
     const dd=calcDueDate(inv.date,inv.dueOffset);
     const ov=isOverdue(inv);
-    const colDates=(inv.collections||[]).map(c=>`${fmtDate(c.date)}: ${fmt(c.amount)}`).join('  |  ');
+    const collections=inv.collections||[];
 
     const vals=[
       {t:inv.number,          c:'#cdd6f4'},
@@ -891,22 +899,46 @@ async function captureClientReport(){
       {t:lbl,                 c:lbl==='مسددة'?'#00A63D':lbl.includes('جزئ')?'#f39c12':'#FF2157'}
     ];
 
+    // كل الخلايا عدا المدفوع: في وسط الصف عمودياً
+    const midY = collections.length>0 ? y+BASE_ROW/2+4 : y+rh/2+5;
     ctx.font='13px Cairo,Arial'; ctx.textAlign='center'; ctx.direction='rtl';
     vals.forEach(({t,c},i)=>{
+      if(i===4) return; // المدفوع نتعامل معاه تحت
       ctx.fillStyle=c;
-      // عمود المدفوع (index 4): لو فيه تواريخ نرفع المبلغ للسطر العلوي
-      const lineY=(i===4&&colDates)?y+20:y+Math.round(rh/2)+5;
-      ctx.fillText(t, W-PX-i*colW-colW/2, lineY);
+      ctx.fillText(t, W-PX-i*colW-colW/2, midY);
     });
 
-    // تاريخ التحصيل تحت المبلغ في نفس عمود المدفوع (col index 4)
-    if(colDates){
-      const cx=W-PX-4*colW-colW/2;
-      ctx.font='10px Cairo,Arial'; ctx.fillStyle='#6c7a99';
+    // ── عمود المدفوع: المجموع فوق، ثم كل تحصيل في سطر
+    const colX=W-PX-4*colW-colW/2;
+    const maxCW=colW-6;
+    if(collections.length===0){
+      ctx.font='13px Cairo,Arial'; ctx.fillStyle='#00A63D';
       ctx.textAlign='center'; ctx.direction='rtl';
-      let dTxt='📅 '+colDates;
-      while(ctx.measureText(dTxt).width>colW-6&&dTxt.length>6) dTxt=dTxt.slice(0,-1);
-      ctx.fillText(dTxt, cx, y+38);
+      ctx.fillText(fmt(inv.paid||0), colX, midY);
+    } else {
+      // المجموع — خط عريض
+      ctx.font='bold 13px Cairo,Arial'; ctx.fillStyle='#00A63D';
+      ctx.textAlign='center'; ctx.direction='rtl';
+      ctx.fillText(fmt(inv.paid||0), colX, y+16);
+      // خط فاصل
+      ctx.strokeStyle='rgba(0,166,61,.25)'; ctx.lineWidth=.5;
+      ctx.beginPath();
+      const lineX1=colX-colW/2+4, lineX2=colX+colW/2-4;
+      ctx.moveTo(lineX1, y+22); ctx.lineTo(lineX2, y+22); ctx.stroke();
+      // كل تحصيل في سطر منفصل
+      collections.forEach((col,ci)=>{
+        const lineY=y+BASE_ROW+ci*COL_LINE+COL_LINE/2+2;
+        ctx.font='10px Cairo,Arial'; ctx.fillStyle='#6c7a99';
+        ctx.textAlign='center'; ctx.direction='rtl';
+        const dateTxt='📅 '+fmtDate(col.date);
+        const amtTxt=fmt(col.amount)+' ج';
+        // التاريخ على اليمين والمبلغ على اليسار داخل العمود
+        ctx.textAlign='right';
+        ctx.fillText(dateTxt, colX+colW/2-4, lineY);
+        ctx.fillStyle='#4ec9b0';
+        ctx.textAlign='left';
+        ctx.fillText(amtTxt, colX-colW/2+4, lineY);
+      });
     }
     y+=rh;
   });
